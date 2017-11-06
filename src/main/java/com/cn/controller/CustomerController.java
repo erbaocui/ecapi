@@ -1,8 +1,7 @@
 package com.cn.controller;
 
-import com.cn.constant.CustomerType;
+
 import com.cn.constant.Status;
-import com.cn.model.Customer;
 import com.cn.model.Customer;
 import com.cn.service.ICustomerService;
 import com.cn.util.ExcelExportUtil;
@@ -263,13 +262,13 @@ public class CustomerController extends BaseController{
             Map<String,Object> map = new HashMap<String,Object>();
             map.put("loginName", c.getLoginName());
             map.put("displayName", c.getDisplayName());
-           if(type.equals(String.valueOf(CustomerType.PERSON.getIndex()))){
+         /*  if(type.equals(String.valueOf(CustomerType.PERSON.getIndex()))){
                map.put("idNumber", c.getIdNumber());
            }else{
                map.put("taxId", c.getTaxId());
                map.put("contact",c.getContact());
                map.put("contactMobile",c.getContactMobile());
-           }
+           }*/
             map.put("status", Status.getName(Integer.parseInt(c.getStatus())) );
             map.put("remark", c.getRemark());
             data.add(map);
@@ -279,12 +278,13 @@ public class CustomerController extends BaseController{
         obj.put("filename",filename);
         try {
             HSSFWorkbook  workbook;
-            if(type.equals(String.valueOf(CustomerType.PERSON.getIndex()))){
+          /*  if(type.equals(String.valueOf(CustomerType.PERSON.getIndex()))){
                 workbook = ExcelExportUtil.export("", "sheet1", personHeaders, p_ds_titles, p_ds_format, null, data);
             }else {
                 workbook = ExcelExportUtil.export("", "sheet1", enterpriseHeaders, e_ds_titles, e_ds_format, null, data);
-            }
+
             viewExcel.buildExcelDocument(obj, workbook, request, response);
+             }*/
         } catch (Exception e) {
             // TODO Auto-generated catch block
             e.printStackTrace();
