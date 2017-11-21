@@ -1,8 +1,6 @@
 package com.cn.dao;
 
 import com.cn.model.Customer;
-import com.cn.model.User;
-
 import java.util.List;
 
 /**

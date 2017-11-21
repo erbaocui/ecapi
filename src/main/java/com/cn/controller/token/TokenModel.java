@@ -1,7 +1,6 @@
 package com.cn.controller.token;
 
 import com.cn.model.Customer;
-import com.cn.model.User;
 import com.cn.util.SerializeUtil;
 
 import java.io.Serializable;

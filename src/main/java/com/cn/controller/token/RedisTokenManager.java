@@ -1,7 +1,7 @@
 package com.cn.controller.token;
 
 import com.cn.model.Customer;
-import com.cn.model.User;
+
 import com.cn.util.SerializeUtil;
 import com.cn.util.redis.RedisClientTemplate;
 import org.springframework.beans.factory.annotation.Autowired;

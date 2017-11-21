@@ -1,7 +1,6 @@
 package com.cn.controller.token;
 
 import com.cn.model.Customer;
-import com.cn.model.User;
 
 /**
  * Created by home on 2017/10/25.
