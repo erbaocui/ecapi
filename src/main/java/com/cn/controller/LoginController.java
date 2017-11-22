@@ -64,7 +64,7 @@ public class LoginController extends BaseController{
      * 登录
      * @param
      * @param
-     *           loginName
+     *          loginName
      * @param password
      *          密码
      * @return
