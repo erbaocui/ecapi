@@ -50,7 +50,7 @@ public class LoginInterceptor implements HandlerInterceptor{
      */
     public boolean preHandle(HttpServletRequest request, HttpServletResponse response,
                              Object handler) throws Exception {
-        String token=(String) request.getParameter("token");
+        String token=(String) request.getHeader("token");
         if (handler instanceof HandlerMethod) {
             HandlerMethod myHandlerMethod = (HandlerMethod) handler;
             Object bean = myHandlerMethod.getBean();

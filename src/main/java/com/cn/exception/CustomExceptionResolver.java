@@ -2,10 +2,13 @@ package com.cn.exception;
 
 import com.alibaba.fastjson.JSON;
 import com.alibaba.fastjson.support.spring.FastJsonJsonView;
+import com.cn.constant.Status;
+import com.cn.vo.RetObj;
 import org.springframework.stereotype.Component;
 import org.springframework.stereotype.Repository;
 import org.springframework.web.servlet.HandlerExceptionResolver;
 import org.springframework.web.servlet.ModelAndView;
+import org.springframework.web.servlet.support.RequestContext;
 
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
@@ -22,28 +25,19 @@ public class CustomExceptionResolver implements HandlerExceptionResolver {
     private org.apache.log4j.Logger errorlogger= org.apache.log4j.Logger.getLogger("Error");
     @Override
     public ModelAndView resolveException(HttpServletRequest httpServletRequest, HttpServletResponse httpServletResponse, Object o, Exception e) {
-        ModelAndView mv = new ModelAndView();
+        RetObj retObj=new RetObj();
         try {
 
-            FastJsonJsonView view = new FastJsonJsonView();
-
-            OutputStream out =  httpServletResponse.getOutputStream();
-            Map<String,String> temp=new HashMap();
-
-            if(e instanceof  Exception) {
-                temp.put("msg","测试错误异常处理");
-            }/*else if(ex instanceof ParameterException) {
-                return new ModelAndView("error-parameter", model);
-            } else {
-                return new ModelAndView("error", model);
-            }*/
+            RequestContext requestContext=new RequestContext(httpServletRequest);
+            retObj.setMsg(requestContext.getMessage("sys.prompt.fail"));
+            retObj.setCode(Status.INVALID.getIndex());
             errorlogger.error(e.getMessage(),e);
-            view.setAttributesMap(temp);
-            mv.setView(view);
+            httpServletResponse.getWriter().print(retObj.toString());
+
         }catch(Exception e1) {
             errorlogger.error(e1.getMessage(),e1);
         }finally {
-            return mv;
+            return null;
         }
     }
 }

@@ -4,6 +4,7 @@ import javax.servlet.http.HttpServletRequest;
 
 import com.alibaba.fastjson.JSON;
 import com.cn.anno.Config;
+import com.cn.constant.Status;
 import com.cn.controller.token.TokenManager;
 import com.cn.controller.token.TokenModel;
 import com.cn.model.Customer;
@@ -11,6 +12,7 @@ import com.cn.service.IEsService;
 import com.cn.util.DateUtil;
 import com.cn.util.IdGenerator;
 import com.cn.vo.ActionLog;
+import com.cn.vo.RetObj;
 import org.apache.commons.lang3.exception.ExceptionUtils;
 import org.apache.log4j.Logger;
 import org.aspectj.lang.ProceedingJoinPoint;
@@ -21,6 +23,7 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Component;
 import org.springframework.web.context.request.RequestContextHolder;
 import org.springframework.web.context.request.ServletRequestAttributes;
+import org.springframework.web.servlet.support.RequestContext;
 
 import java.lang.annotation.Annotation;
 import java.lang.reflect.Method;
@@ -129,7 +132,7 @@ public class LogAopAction {
                 Config config = method.getAnnotation(Config.class);
                 boolean interfaceLog = config.interfaceLog();
                 if (interfaceLog) {
-                    String token=(String) request.getParameter("token");
+                    String token=(String) request.getHeader("token");
                     TokenModel tokenModel=null;
                     Customer customer=null;
                     if(token!=null&&(!token.equals(""))){
@@ -144,7 +147,7 @@ public class LogAopAction {
                         log.setToken(token);
                     }
                     Map requestMap= requestParams(request);
-                    log.setRequestParam(requestMap.toString());
+                    log.setRequestParam(JSON.toJSONString(requestMap).toString());
                     log.setModule(config.module());
                     log.setMethod(config.methods());
                     //log.setLoginIp(getIp(request));
@@ -158,7 +161,7 @@ public class LogAopAction {
                         log.setDescription("执行成功");
                         log.setExecuteTime(String.valueOf(endTime - beginTime));
                         log.setStatus(0);
-                        log.setResponseParam(object.toString());
+                        log.setResponseParam(JSON.toJSONString(object).toString());
                         writeLog(log);
                     } catch (Exception e) {
                         // TODO Auto-generated catch block;
@@ -171,6 +174,11 @@ public class LogAopAction {
 
                         String fullStackTrace = ExceptionUtils.getStackTrace(e);
                         log.setErrorStack(fullStackTrace);
+                        RequestContext requestContext=new RequestContext(request);
+                        RetObj retObj=new RetObj();
+                        retObj.setMsg(requestContext.getMessage("sys.prompt.fail"));
+                        retObj.setCode(Status.INVALID.getIndex());
+                        log.setResponseParam(JSON.toJSONString(retObj).toString());
                         writeLog(log);
                         throw e;
 

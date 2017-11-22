@@ -75,6 +75,7 @@
 
     <mvc:default-servlet-handler />
     <import resource="classpath:spring-mvc-aop.xml"/>
+    <import resource="classpath:spring-mvc-i18n.xml"/>
 
 <!--<aop:aspectj-autoproxy expose-proxy="true"></aop:aspectj-autoproxy>-->
 </beans>

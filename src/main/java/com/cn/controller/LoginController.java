@@ -12,13 +12,16 @@ import com.cn.service.ICustomerService;
 
 import com.cn.util.MD5Util;
 
+import com.cn.vo.RetObj;
 import org.apache.log4j.Logger;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.context.annotation.Scope;
 import org.springframework.stereotype.Controller;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.ResponseBody;
+import org.springframework.web.servlet.support.RequestContext;
 
+import javax.servlet.http.HttpServletRequest;
 import java.util.*;
 
 
@@ -61,18 +64,21 @@ public class LoginController extends BaseController{
      * 登录
      * @param
      * @param
-     *           customerName
+     *           loginName
      * @param password
      *          密码
      * @return
      */
     @RequestMapping(value="/login")
-    @Config(methods = "测试方法",module = "测试模块",needlogin = false,interfaceLog =true)
-    public @ResponseBody Map login(String customerName,String password) throws Exception{
+    @Config(methods = "login",module = "客户模块",needlogin = false,interfaceLog =true)
+    public @ResponseBody
+    RetObj login(HttpServletRequest request,String loginName , String password) throws Exception{
         //在Session里保存信息
+        RetObj retObj=new RetObj();
+        RequestContext requestContext=new RequestContext(request);
         Customer  customer=new Customer();
         Map map=new HashMap();
-        customer.setLoginName(customerName);
+        customer.setLoginName(loginName);
         Customer c=customerService.getCustomerByEntity( customer);
         if(null!=c&&c.getPassword().equals(MD5Util.md5(password))){
             AppLogin lastAppLogin=new  AppLogin();
@@ -96,15 +102,19 @@ public class LoginController extends BaseController{
             currentAppLogin.setTokenId(token.getToken());
             lastAppLogin.setStatus(String.valueOf(Status.INVALID.getIndex()));
             customerService.addApploginCustomer(currentAppLogin, lastAppLogin);
+            map.put("customer",c);
             map.put("token",token.getToken());
+            retObj.setData(map);
 
 
         }else{
-            map.put("test","");
+            retObj.setCode(Status.INVALID.getIndex());
+            retObj.setMsg(requestContext.getMessage("sys.prompt.fail"));
         }
 
+        retObj.setMsg(requestContext.getMessage("sys.prompt.success"));
+        return retObj;
 
-        return map;
 
     }
 
@@ -117,16 +127,20 @@ public class LoginController extends BaseController{
      * @throws Exception
      */
     @RequestMapping(value="/logout")
-    public @ResponseBody Map logout() throws Exception{
-        //清除Session
-        //User user=new User();
-        Map map=new HashMap();
-        /*user.setId("745e706be84140c8a93c181497ef3c7d");
-  String token= tokenManager.getToken(user);
-        if(token!=null){
-                tokenManager.deleteToken(user.getId());
-        }*/
-        return map;
+    @Config(methods = "logout",module = "登陆模块",needlogin = true,interfaceLog =true)
+    public @ResponseBody RetObj logout(HttpServletRequest request) throws Exception{
+
+        String token=(String) request.getHeader("token");
+        TokenModel tokenModel=null;
+        if(token!=null&&(!token.equals(""))){
+            tokenManager.deleteToken(token);
+
+        }
+        RetObj retObj=new RetObj();
+        RequestContext requestContext=new RequestContext(request);
+        retObj.setMsg(requestContext.getMessage("sys.prompt.success"));
+        return retObj;
+
 
     }
 

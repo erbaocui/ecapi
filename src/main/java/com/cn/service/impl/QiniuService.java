@@ -1,6 +1,6 @@
 package com.cn.service.impl;
 
-import com.cn.constant.Qiniu;
+import com.cn.constant.QiNiu;
 import com.cn.service.IQiniuService;
 import com.qiniu.http.Response;
 import com.qiniu.storage.UploadManager;
@@ -12,10 +12,10 @@ import java.io.IOException;
 @Service("qiniuService")
 public class QiniuService implements IQiniuService {
 	// 设置好账号的ACCESS_KEY和SECRET_KEY
-	private String ACCESS_KEY = Qiniu.ACCESS_KEY;
-	private String SECRET_KEY = Qiniu.SECRET_KEY;
+	private String ACCESS_KEY = QiNiu.ACCESS_KEY;
+	private String SECRET_KEY = QiNiu.SECRET_KEY;
 	// 要上传的空间
-	private String BUCKET_NAME = Qiniu.BUCKET_NAME;
+	private String BUCKET_NAME = QiNiu.BUCKET_NAME;
 	// 密钥配置
 	private Auth auth = Auth.create(ACCESS_KEY, SECRET_KEY);
 	// 创建上传对象
