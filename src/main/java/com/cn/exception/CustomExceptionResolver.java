@@ -16,28 +16,39 @@ import java.io.IOException;
 import java.io.OutputStream;
 import java.util.HashMap;
 import java.util.Map;
+import org.springframework.web.util.WebUtils;
 
 /**
  * Created by home on 2017/11/1.
  */
 @Component("exceptionHandler")
+
 public class CustomExceptionResolver implements HandlerExceptionResolver {
     private org.apache.log4j.Logger errorlogger= org.apache.log4j.Logger.getLogger("Error");
     @Override
     public ModelAndView resolveException(HttpServletRequest httpServletRequest, HttpServletResponse httpServletResponse, Object o, Exception e) {
-        RetObj retObj=new RetObj();
+        ModelAndView  modelAndView=new ModelAndView();
         try {
-
             RequestContext requestContext=new RequestContext(httpServletRequest);
-            retObj.setMsg(requestContext.getMessage("sys.prompt.fail"));
+            RetObj retObj=new RetObj();
             retObj.setCode(Status.INVALID.getIndex());
+            retObj.setMsg(requestContext.getMessage("sys.prompt.exception"));
+            String data =  JSON.toJSONString(retObj);
+            /*httpServletResponse.setStatus(555);
+            httpServletRequest.setAttribute("javax.servlet.error.status_code",555);
+            httpServletResponse.setCharacterEncoding("UTF-8");
+            httpServletResponse.setContentType("application/json; charset=utf-8");
+            OutputStream out =  httpServletResponse.getOutputStream();
+            String data =  JSON.toJSONString(retObj);
+            out.write(data.getBytes("UTF-8"));*/
+            modelAndView.addObject("data", data);
+                    modelAndView.setViewName("/error");
             errorlogger.error(e.getMessage(),e);
-            httpServletResponse.getWriter().print(retObj.toString());
 
         }catch(Exception e1) {
             errorlogger.error(e1.getMessage(),e1);
         }finally {
-            return null;
+            return modelAndView;
         }
     }
 }

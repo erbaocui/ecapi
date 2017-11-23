@@ -1,36 +1,19 @@
 package com.cn.controller;
 
 
-import com.cn.anno.Config;
-import com.cn.appvo.CountryCode;
-import com.cn.appvo.QiNiu;
-import com.cn.constant.Status;
-import com.cn.model.Customer;
-import com.cn.service.ICustomerService;
-import com.cn.util.MD5Util;
+import com.cn.annotation.Config;
+import com.cn.param.OutCountryCode;
+import com.cn.param.OutQiNiu;
 import com.cn.util.PropertiesUtil;
-import com.cn.util.StringUtil;
-import com.cn.view.ViewExcel;
 import com.cn.vo.RetObj;
-import com.github.pagehelper.PageHelper;
-import com.github.pagehelper.PageInfo;
 import org.apache.log4j.Logger;
-import org.apache.poi.hssf.usermodel.HSSFWorkbook;
-import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.context.annotation.Scope;
 import org.springframework.stereotype.Controller;
-import org.springframework.ui.ModelMap;
 import org.springframework.web.bind.annotation.RequestMapping;
-import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.ResponseBody;
-import org.springframework.web.context.WebApplicationContext;
-import org.springframework.web.context.support.WebApplicationContextUtils;
-import org.springframework.web.servlet.ModelAndView;
 import org.springframework.web.servlet.support.RequestContext;
-import org.springframework.web.servlet.support.RequestContextUtils;
 
 import javax.servlet.http.HttpServletRequest;
-import javax.servlet.http.HttpServletResponse;
 import javax.servlet.http.HttpSession;
 import java.util.*;
 
@@ -69,9 +52,9 @@ public class SystemController extends BaseController{
         RequestContext requestContext=new RequestContext(request);
         String str=requestContext.getMessage("cc.countrycode");
         String[] ccs=str.split(",");
-        List<CountryCode> list=new ArrayList<CountryCode>();
+        List<OutCountryCode> list=new ArrayList<OutCountryCode>();
         for(String cc:ccs){
-            CountryCode countryCode=new CountryCode();
+            OutCountryCode countryCode=new OutCountryCode();
             String[] items=cc.split(":");
             countryCode.setCountry(items[0]);
             countryCode.setCode(items[1]);
@@ -93,7 +76,7 @@ public class SystemController extends BaseController{
     @Config(methods = "qiniu" ,module = "系统",needlogin = false,interfaceLog =true)
     RetObj qiniu(HttpServletRequest request,HttpSession session)throws Exception
     {
-        QiNiu qiNiu=new QiNiu();
+        OutQiNiu qiNiu=new OutQiNiu();
         qiNiu.setAccessKey(PropertiesUtil.getStringByKey("qiniu.AccessKey", "qiniu.properties"));
         qiNiu.setSecretKey(PropertiesUtil.getStringByKey("qiniu.SecretKey", "qiniu.properties"));
         qiNiu.setBucket(PropertiesUtil.getStringByKey("qiniu.bucketName", "qiniu.properties"));

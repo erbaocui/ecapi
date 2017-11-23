@@ -6,6 +6,9 @@ import com.cn.model.AppLogin;
 import com.cn.service.IAppLoginService;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Isolation;
+import org.springframework.transaction.annotation.Propagation;
+import org.springframework.transaction.annotation.Transactional;
 
 import java.util.List;
 
@@ -32,10 +35,7 @@ public class AppLoginService implements IAppLoginService {
     public AppLogin getAppLoginByEntity(AppLogin appLogin) {
         return appLoginDao.find(appLogin);
     }
-    @Override
-    public void addAppLogin(AppLogin appLogin) {
-        appLoginDao.insert(appLogin);
-    }
+
 
     @Override
     public void modifyAppLogin(AppLogin appLogin) {
@@ -45,6 +45,19 @@ public class AppLoginService implements IAppLoginService {
     @Override
     public void deleteAppLogin(AppLogin appLogin) {
         appLoginDao.delete(appLogin.getId());
+    }
+    @Override
+    @Transactional(propagation= Propagation.REQUIRED,rollbackFor={RuntimeException.class, Exception.class},timeout=10,isolation= Isolation.SERIALIZABLE)
+    public void  addApplogin( AppLogin appLogin,AppLogin lastAppLogin)throws Exception{
+        if( lastAppLogin!=null) {
+            appLoginDao.update(lastAppLogin);
+        }
+        appLoginDao.insert(appLogin);
+    }
+
+    @Override
+    public AppLogin getLastApploginByEntity(AppLogin lastAppLogin) {
+        return  appLoginDao.find(lastAppLogin);
     }
 
 

@@ -1,15 +1,19 @@
 package com.cn.controller;
 
-import com.cn.anno.Config;
+import com.cn.annotation.Config;
+import com.cn.annotation.JsonParam;
 import com.cn.constant.Status;
 import com.cn.controller.token.TokenManager;
 import com.cn.controller.token.TokenModel;
 import com.cn.model.AppLogin;
 import com.cn.model.Customer;
 
+import com.cn.param.InLogin;
+import com.cn.service.IAppLoginService;
 import com.cn.service.ICustomerService;
 
 
+import com.cn.util.IdGenerator;
 import com.cn.util.MD5Util;
 
 import com.cn.vo.RetObj;
@@ -39,6 +43,8 @@ public class LoginController extends BaseController{
 
     @Autowired
     private ICustomerService customerService;
+    @Autowired
+    private IAppLoginService appLoginService;
     @Autowired
     private TokenManager tokenManager;
 
@@ -72,19 +78,19 @@ public class LoginController extends BaseController{
     @RequestMapping(value="/login")
     @Config(methods = "login",module = "客户模块",needlogin = false,interfaceLog =true)
     public @ResponseBody
-    RetObj login(HttpServletRequest request,String loginName , String password) throws Exception{
+    RetObj login(@JsonParam InLogin inLogin,HttpServletRequest request) throws Exception{
         //在Session里保存信息
         RetObj retObj=new RetObj();
         RequestContext requestContext=new RequestContext(request);
         Customer  customer=new Customer();
         Map map=new HashMap();
-        customer.setLoginName(loginName);
+        customer.setLoginName( inLogin.getLoginName());
         Customer c=customerService.getCustomerByEntity( customer);
-        if(null!=c&&c.getPassword().equals(MD5Util.md5(password))){
+        if(null!=c&&c.getPassword().equals(inLogin.getPassword())){
             AppLogin lastAppLogin=new  AppLogin();
             lastAppLogin.setCustomerId(c.getId());
             lastAppLogin.setStatus(String.valueOf(Status.EFFECTIVE.getIndex()));
-            lastAppLogin=customerService.getLastApploginByEntity(lastAppLogin);
+            lastAppLogin=appLoginService.getLastApploginByEntity(lastAppLogin);
             if( lastAppLogin!=null){
                 TokenModel  lastToken= tokenManager.getToken(lastAppLogin.getTokenId());
                 if(lastToken!=null) {
@@ -93,15 +99,15 @@ public class LoginController extends BaseController{
             }
             TokenModel token=tokenManager.createToken(c);
             AppLogin currentAppLogin=new  AppLogin();
-            String uuid = UUID.randomUUID().toString().replaceAll("-", "");
-            currentAppLogin.setId(uuid);
+
+            currentAppLogin.setId(IdGenerator.getId());
             currentAppLogin.setCustomerId(c.getId());
             currentAppLogin.setCustomerName(c.getDisplayName());
             currentAppLogin.setLoginTime(new Date());
             currentAppLogin.setStatus(String.valueOf(Status.EFFECTIVE.getIndex()));
             currentAppLogin.setTokenId(token.getToken());
             lastAppLogin.setStatus(String.valueOf(Status.INVALID.getIndex()));
-            customerService.addApploginCustomer(currentAppLogin, lastAppLogin);
+            appLoginService.addApplogin(currentAppLogin, lastAppLogin);
             map.put("customer",c);
             map.put("token",token.getToken());
             retObj.setData(map);
@@ -151,5 +157,13 @@ public class LoginController extends BaseController{
 
     public void setCustomerService(ICustomerService customerService) {
         this.customerService = customerService;
+    }
+
+    public IAppLoginService getAppLoginService() {
+        return appLoginService;
+    }
+
+    public void setAppLoginService(IAppLoginService appLoginService) {
+        this.appLoginService = appLoginService;
     }
 }

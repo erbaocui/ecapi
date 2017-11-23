@@ -1,6 +1,7 @@
 package com.cn.dao;
 
 import com.cn.model.Customer;
+
 import java.util.List;
 
 /**
@@ -13,7 +14,6 @@ public interface ICustomerDao {
 
 
     public List<Customer> pageList(Customer customer);
-    public List<Customer> allValidList(String type);
     public void insert(Customer customer);
     public void update(Customer customer);
     public Customer find(Customer customer);

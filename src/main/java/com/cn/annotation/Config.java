@@ -1,4 +1,4 @@
-package com.cn.anno;
+package com.cn.annotation;
 
 import java.lang.annotation.*;
 

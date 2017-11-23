@@ -17,7 +17,10 @@ public  interface   TokenManager {
      */
     public TokenModel createToken(Customer customer);
 
-    /**
+     public void resetToken(TokenModel okenModel);
+
+
+ /**
      * 检查token是否有效
      * @param model token
      * @return 是否有效

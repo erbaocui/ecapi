@@ -2,7 +2,6 @@ package com.cn.three.sms;
 
 
 import com.alibaba.fastjson.JSON;
-import sms.utils.MobClient;
 
 import java.util.Map;
 
@@ -38,11 +37,11 @@ public class SmsVerifyKit {
 	 * @return
 	 * @throws Exception
 	 */
-	public Boolean  go() throws Exception{
+	public Integer  go() throws Exception{
 		
 		String address = "https://webapi.sms.mob.com/sms/verify";
 		MobClient client = null;
-		Boolean result=false;
+		Integer status=null;
 		try {
 			client = new MobClient(address);
 			client.addParam("appkey", appkey).addParam("phone", phone)
@@ -52,14 +51,11 @@ public class SmsVerifyKit {
 			String str = client.post();
 			//return result;
 			Map maps = (Map) JSON.parse(str);
-			Integer status=(Integer) maps.get("status");
-			if(status.equals(200)){
-				result=true;
-			}
+			status=(Integer) maps.get("status");
 
 		} finally {
 			client.release();
-			return result;
+			return status;
 		}
 	}
 	

@@ -3,14 +3,13 @@ package com.cn.aop;
 import javax.servlet.http.HttpServletRequest;
 
 import com.alibaba.fastjson.JSON;
-import com.cn.anno.Config;
+import com.cn.annotation.Config;
 import com.cn.constant.Status;
 import com.cn.controller.token.TokenManager;
 import com.cn.controller.token.TokenModel;
 import com.cn.model.Customer;
 import com.cn.service.IEsService;
 import com.cn.util.DateUtil;
-import com.cn.util.IdGenerator;
 import com.cn.vo.ActionLog;
 import com.cn.vo.RetObj;
 import org.apache.commons.lang3.exception.ExceptionUtils;

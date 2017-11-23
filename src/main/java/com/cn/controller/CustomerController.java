@@ -1,29 +1,30 @@
 package com.cn.controller;
 
-
+import com.cn.annotation.Config;
+import com.cn.annotation.JsonParam;
+import com.cn.constant.Mob;
 import com.cn.constant.Status;
+import com.cn.controller.token.TokenManager;
+import com.cn.controller.token.TokenModel;
 import com.cn.model.Customer;
+import com.cn.param.InChgPwd;
+import com.cn.param.InCustomer;
+import com.cn.param.InFindPwd;
+import com.cn.param.InRegister;
 import com.cn.service.ICustomerService;
-import com.cn.util.ExcelExportUtil;
-import com.cn.util.MD5Util;
-import com.cn.util.StringUtil;
-import com.cn.view.ViewExcel;
-import com.github.pagehelper.PageHelper;
-import com.github.pagehelper.PageInfo;
+import com.cn.three.sms.SmsVerifyKit;
+import com.cn.util.IdGenerator;
+
+import com.cn.vo.RetObj;
 import org.apache.log4j.Logger;
-import org.apache.poi.hssf.usermodel.HSSFWorkbook;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.context.annotation.Scope;
 import org.springframework.stereotype.Controller;
-import org.springframework.ui.ModelMap;
 import org.springframework.web.bind.annotation.RequestMapping;
-import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.ResponseBody;
-import org.springframework.web.servlet.ModelAndView;
+import org.springframework.web.servlet.support.RequestContext;
 
 import javax.servlet.http.HttpServletRequest;
-import javax.servlet.http.HttpServletResponse;
-import javax.servlet.http.HttpSession;
 import java.util.*;
 
 
@@ -41,6 +42,9 @@ public class CustomerController extends BaseController{
     @Autowired
     private ICustomerService customerService;
 
+    @Autowired
+    private TokenManager tokenManager;
+
 
     public Logger getLogger() {
         return logger;
@@ -49,248 +53,152 @@ public class CustomerController extends BaseController{
     public void setLogger(Logger logger) {
         this.logger = logger;
     }
+
+
     /**
-     * 个人客户管理
+     * 客户注册
      * @param
      *
      * @return listMenu json
      */
-    @RequestMapping(value="/person")
-    public String person() throws Exception{
-        return "redirect:/page/customer/personList.jsp";
-    }
-    /**
-     * 企业客户管理
-     * @param
-     *
-     * @return listMenu json
-     */
-    @RequestMapping(value="/enterprise")
-    public String enterprise() throws Exception{
-        return "redirect:/page/customer/enterpriseList.jsp";
-    }
-    /**
-     * 客户列表查询
-     * @param
-     *
-     * @return listMenu json
-     */
-    @RequestMapping(value = "/list")
+    @RequestMapping(value = "/register")
+    @Config(methods = "register",module = "客户模块",needlogin = false,interfaceLog =true)
     public @ResponseBody
-    Map customerList(@RequestParam(value="page", required=false) String page,
-                 @RequestParam(value="rows", required=false) String rows,
-            String loginName,String displayName,String status,String type,HttpSession session)throws Exception
+    RetObj regiest(@JsonParam InRegister inRegister,HttpServletRequest request)throws Exception
     {
-        PageHelper.startPage(Integer.valueOf(page) ,Integer.valueOf(rows));
+        RetObj retObj=new RetObj();
+        RequestContext requestContext=new RequestContext(request);
         Customer customer=new Customer();
-        if(StringUtil.isNotEmpty(loginName)) {
-            customer.setLoginName(loginName);
-            session.setAttribute("loginName",loginName);
+        customer.setLoginName(inRegister.getPhone());
+        Customer c=customerService.getCustomerByEntity(customer);
+        if(c!=null) {
+            retObj.setCode(Status.INVALID.getIndex());
+            retObj.setMsg(requestContext.getMessage("sys.customer.exist"));
+            return retObj;
         }
-        if(StringUtil.isNotEmpty(displayName)) {
-            customer.setDisplayName(displayName);
-            session.setAttribute("displayName",displayName);
-        }
-        if(StringUtil.isNotEmpty(status)) {
-           if(!status.equals("-1")){
-               customer.setStatus(status);
-               session.setAttribute("status",status);
-           }
-        }
-        customer.setType(type);
-        List<Customer> list=customerService.getCustomerPageByEntity(customer);
-        PageInfo<Customer>p=new PageInfo<Customer>(list);
-        Map map=new HashMap();
-        map.put("total", Long.toString(p.getTotal()));
-        map.put("rows",list);
-     /*   map.put("total", 0);
-        map.put("rows",new ArrayList());*/
-        return map;
-    }
 
+        Integer status=new SmsVerifyKit(Mob.APP_KEY, inRegister.getPhone(),inRegister.getCc(), inRegister.getVc()).go();
+        if(status.equals(200)){
+            customer=new Customer();
+            customer.setId(IdGenerator.getId());
+            customer.setLoginName(inRegister.getPhone());
+            customer.setPassword(inRegister.getPwd());
+            customer.setStatus("0");
+            customerService.addCustomer(customer);
+
+            retObj.setMsg(requestContext.getMessage("sys.prompt.success"));
+        }else{
+            retObj.setCode(status);
+            retObj.setMsg(requestContext.getMessage("sys.customer.vcerror"));
+        }
+
+        return retObj;
+
+    }
     /**
-     * 客户查询
+     *  忘记密码
      * @param
      *
-     * @return map json
+     * @return listMenu json
      */
-    @RequestMapping(value = "/exist")
+    @RequestMapping(value = "/findpwd")
+    @Config(methods = "findpwd",module = "客户模块",needlogin = false,interfaceLog =true)
     public @ResponseBody
-    Map exist(String loginName)throws Exception
+    RetObj findpwd(@JsonParam InFindPwd inFindPwd,HttpServletRequest request)throws Exception
     {
-        Map result=new HashMap();
-        Boolean flag=false;
-        Customer customer=new Customer();
-        customer.setLoginName(loginName);
-        Customer u=customerService.getCustomerByEntity(customer);
-        if(null!=u){
-            flag=true;
-        }
-        result.put("result",flag);
-        return result;
-    }
-
-
-    /**
-     * 客户添加
-     * @param
-     *
-     * @return map json
-     */
-    @RequestMapping(value = "/add")
-    public @ResponseBody
-    Map add(String loginName,String displayName,String idNumber,String type,String password,String remark,String taxId,String contactMobile,String contact)throws Exception {
-        Map result = new HashMap();
-        Customer customer = new Customer();
-        String uuid = UUID.randomUUID().toString().replaceAll("-", "");
-        customer.setId(uuid);
-        customer.setLoginName(loginName);
-        customer.setDisplayName(displayName);
-        customer.setType(type);
-        if (type.equals("1")) {
-            customer.setContact(contact);
-            customer.setContactMobile(contactMobile);
-            customer.setTaxId(taxId);
+        RetObj retObj=new RetObj();
+        RequestContext requestContext=new RequestContext(request);
+        Integer status=new SmsVerifyKit(Mob.APP_KEY, inFindPwd.getPhone(), inFindPwd.getCc(), inFindPwd.getVc()).go();
+        if(status.equals(200)){
+            Customer customer=new Customer();
+            customer.setLoginName(inFindPwd.getPhone());
+            Customer c=customerService.getCustomerByEntity(customer);
+            if(c!=null){
+                customer=new Customer();
+                customer.setId(c.getId());
+                customer.setPassword(inFindPwd.getPwd());
+                customerService.modifyCustomer(customer);
+                retObj.setMsg(requestContext.getMessage("sys.prompt.success"));
+            }else{
+                retObj.setCode(Status.INVALID.getIndex());
+                retObj.setMsg(requestContext.getMessage("sys.customer.noperson"));
+            }
 
         }else{
-            if (StringUtil.isNotEmpty(idNumber)){
-                customer.setIdNumber(idNumber);
+            retObj.setCode(status);
+            retObj.setMsg(requestContext.getMessage("sys.customer.vcerror"));
+        }
+        return retObj;
+
+    }
+    /**
+     *  更改密码
+     * @param
+     *
+     * @return listMenu json
+     */
+    @RequestMapping(value = "/chgpwd")
+    @Config(methods = "chgpwd",module = "客户模块",needlogin = true,interfaceLog =true)
+    public @ResponseBody
+    RetObj chgpwd(@JsonParam InChgPwd inChgPwd,HttpServletRequest request)throws Exception
+    {
+        RetObj retObj=new RetObj();
+        RequestContext requestContext=new RequestContext(request);
+        String token=(String) request.getHeader("token");
+        TokenModel tokenModel=tokenManager.getToken(token);
+        Customer currentCustomer=tokenModel.getCustomer();
+        if(currentCustomer.getPassword().equals(inChgPwd.getOldpwd())){
+            Customer customer=new Customer();
+            customer.setId(currentCustomer.getId());
+            customer=new Customer();
+            customer.setPassword(inChgPwd.getNewpwd());
+            customerService.modifyCustomer(customer);
+            tokenManager.deleteToken(token);
+            retObj.setMsg(requestContext.getMessage("sys.prompt.success"));
+            }else{
+                retObj.setCode(Status.INVALID.getIndex());
+                retObj.setMsg(requestContext.getMessage("sys.customer.pwderror"));
             }
-        }
-        if (StringUtil.isNotEmpty(remark)){
-            customer.setRemark(remark);
-        }
-        customer.setStatus("0");
-        customer.setPassword(MD5Util.md5(password));
-        customerService.addCustomer(customer);
-        result.put("result","success");
-         return result;
+        return retObj;
+
     }
 
+
+
+
+
+
     /**
-     * 客户编辑
+     * 客户信息更新
      * @param
      *
      * @return map json
      */
-    @RequestMapping(value = "/modify")
+    @RequestMapping(value = "/update")
+    @Config(methods = "update",module = "客户模块",needlogin = true,interfaceLog =true)
     public @ResponseBody
-    Map modify(String id,String idNumber,String displayName,String type,String password,String remark,String taxId,String contactMobile,String contact,String status)throws Exception
-    {
-        Map result=new HashMap();
-        Customer customer=new Customer();
-        customer.setId(id);
-        customer.setDisplayName(displayName);
-        if(type.equals("1")){
-            customer.setContact(contact);
-            customer.setContactMobile(contactMobile);
-            customer.setTaxId(taxId);
-        }else{
-            if (StringUtil.isNotEmpty(idNumber)){
-                customer.setIdNumber(idNumber);
-            }
-        }
-        if (StringUtil.isNotEmpty(remark)) {
-            customer.setRemark(remark);
-        }
-        if (StringUtil.isNotEmpty(password)) {
-            customer.setPassword(MD5Util.md5(password));
-        }
-        customer.setStatus(status);
-
+    RetObj update(@JsonParam InCustomer inCustomer,HttpServletRequest request)throws Exception {
+        RetObj retObj=new RetObj();
+        RequestContext requestContext=new RequestContext(request);
+        String token=(String) request.getHeader("token");
+        TokenModel tokenModel=tokenManager.getToken(token);
+        Customer customer=tokenModel.getCustomer();
+        customer.setDisplayName(inCustomer.getName());
+        customer.setGender(inCustomer.getGender());
+        customer.setBirthdate(inCustomer.getBirthdate());
+        customer.setProvince(inCustomer.getProvince());
+        customer.setCity(inCustomer.getCity());
+        customer.setCounty(inCustomer.getCounty());
+        customer.setHead(inCustomer.getHead());
         customerService.modifyCustomer(customer);
-        result.put("result","success");
-        return result;
-    }
-    /**
-     *有效乘客列表
-     * @param
-     *
-     * @return listCar json
-     */
-    @RequestMapping(value = "/validList")
-    public @ResponseBody
-    List<Customer> validList(String type)throws Exception
-    {
-        List<Customer> list=  customerService.getAllValidCustomer(type);
-        return list;
+        tokenModel.setCustomer(customer);
+        tokenManager.resetToken(tokenModel);
+        retObj.setMsg(requestContext.getMessage("sys.prompt.success"));
+        return retObj;
     }
 
-    @RequestMapping(value="/export")
-    public ModelAndView export(ModelMap model, HttpServletRequest request, HttpServletResponse response,
-                               HttpSession session,String type) {
-        ViewExcel viewExcel = new ViewExcel();
-        Map obj = new HashMap();
-
-        String displayName,loginName,status;
-        displayName=(String)session.getAttribute("displayName");
-        loginName=(String)session.getAttribute("loginName");
-        status=(String)session.getAttribute("status");
-        Customer customer=new Customer();
-        if(StringUtil.isNotEmpty(loginName)) {
-            customer.setLoginName(loginName);
-            session.removeAttribute("loginName");
-
-        }
-        if(StringUtil.isNotEmpty(displayName)) {
-            customer.setDisplayName(displayName);
-            session.removeAttribute("displayName");
-
-        }
-        customer.setType(type);
-        if(StringUtil.isNotEmpty(status)) {
-            if(!status.equals("-1")){
-                customer.setStatus(status);
-                session.removeAttribute("status");
-            }
-        }
-        List<Customer> list=customerService.getCustomerPageByEntity(customer);
-
-        String[] personHeaders={"登录名", "显示名","身份证号","状态","备注"};
-        String[] enterpriseHeaders={"登录名", "显示名","企业税号","联系人","联系电话","状态","备注"};
-
-        String[] p_ds_titles = { "loginName", "displayName", "idNumber","status","remark"};
-        String[] e_ds_titles = { "loginName", "displayName", "taxId","contact","contactMobile","status","remark"};
 
 
-
-        int[] p_ds_format = { 1, 1, 1,1,1};
-        int[] e_ds_format = { 1, 1, 1,1,1,1,1};
-        List<Map<String,Object>> data =new ArrayList<Map<String,Object>>();
-        //if(CollectionUtils.isNotEmpty(dataset)){
-        for(Customer c :list){
-            Map<String,Object> map = new HashMap<String,Object>();
-            map.put("loginName", c.getLoginName());
-            map.put("displayName", c.getDisplayName());
-         /*  if(type.equals(String.valueOf(CustomerType.PERSON.getIndex()))){
-               map.put("idNumber", c.getIdNumber());
-           }else{
-               map.put("taxId", c.getTaxId());
-               map.put("contact",c.getContact());
-               map.put("contactMobile",c.getContactMobile());
-           }*/
-            map.put("status", Status.getName(Integer.parseInt(c.getStatus())) );
-            map.put("remark", c.getRemark());
-            data.add(map);
-        }
-        // }
-        String filename="customer.xls";
-        obj.put("filename",filename);
-        try {
-            HSSFWorkbook  workbook;
-          /*  if(type.equals(String.valueOf(CustomerType.PERSON.getIndex()))){
-                workbook = ExcelExportUtil.export("", "sheet1", personHeaders, p_ds_titles, p_ds_format, null, data);
-            }else {
-                workbook = ExcelExportUtil.export("", "sheet1", enterpriseHeaders, e_ds_titles, e_ds_format, null, data);
-
-            viewExcel.buildExcelDocument(obj, workbook, request, response);
-             }*/
-        } catch (Exception e) {
-            // TODO Auto-generated catch block
-            e.printStackTrace();
-        }
-        return new ModelAndView(viewExcel, model);
-    }
 
     public ICustomerService getCustomerService() {
         return customerService;
@@ -298,5 +206,13 @@ public class CustomerController extends BaseController{
 
     public void setCustomerService(ICustomerService customerService) {
         this.customerService = customerService;
+    }
+
+    public TokenManager getTokenManager() {
+        return tokenManager;
+    }
+
+    public void setTokenManager(TokenManager tokenManager) {
+        this.tokenManager = tokenManager;
     }
 }

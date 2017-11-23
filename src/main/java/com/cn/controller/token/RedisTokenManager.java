@@ -24,6 +24,13 @@ public class RedisTokenManager implements  TokenManager {
     //protected int tokenExpireSeconds = 7 * 24 * 3600;
    // protected int tokenExpireSeconds = 10;
 
+
+    public void resetToken( TokenModel tokenModel) {
+        String token=tokenModel.getToken();
+        redisClientTemplate.set(SerializeUtil.serialize(REDIS_TOKEN_PREFIX+ token),SerializeUtil.serialize(tokenModel));
+        redisClientTemplate.expire(SerializeUtil.serialize(REDIS_TOKEN_PREFIX+token),tokenExpireSeconds );
+    }
+
     @Autowired
     private RedisClientTemplate redisClientTemplate;
 

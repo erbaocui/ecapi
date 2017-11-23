@@ -1,8 +1,6 @@
 package com.cn.dao.impl;
 
 import com.cn.dao.ICustomerDao;
-import com.cn.dao.ICustomerDao;
-import com.cn.model.Customer;
 import com.cn.model.Customer;
 import org.springframework.stereotype.Repository;
 
@@ -21,10 +19,6 @@ public class CustomerDaoImpl extends BaseDaoImpl implements ICustomerDao {
 
     }
 
-    @Override
-    public List<Customer> allValidList(String type) {
-        return (List<Customer>)list("com.cn.dao.CustomerMapper.selectAllValid", type);
-    }
 
     @Override
     public void insert(Customer customer) {
