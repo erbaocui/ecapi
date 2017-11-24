@@ -23,7 +23,7 @@ import java.util.*;
  */
 
 @Controller
-@RequestMapping("/system")
+@RequestMapping("/sys")
 @Scope("prototype")
 public class SystemController extends BaseController{
 
