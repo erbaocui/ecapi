@@ -6,6 +6,7 @@ package com.cn.param;
 public class InRegister {
     private  String cc;
     private String phone;
+    private String name;
     private String pwd;
     private String vc;
 
@@ -42,5 +43,13 @@ public class InRegister {
 
     public void setVc(String vc) {
         this.vc = vc;
+    }
+
+    public String getName() {
+        return name;
+    }
+
+    public void setName(String name) {
+        this.name = name;
     }
 }

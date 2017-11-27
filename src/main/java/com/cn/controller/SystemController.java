@@ -4,9 +4,11 @@ package com.cn.controller;
 import com.cn.annotation.Config;
 import com.cn.param.OutCountryCode;
 import com.cn.param.OutQiNiu;
+import com.cn.three.qiniu.QiniuService;
 import com.cn.util.PropertiesUtil;
 import com.cn.vo.RetObj;
 import org.apache.log4j.Logger;
+import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.context.annotation.Scope;
 import org.springframework.stereotype.Controller;
 import org.springframework.web.bind.annotation.RequestMapping;
@@ -28,6 +30,8 @@ import java.util.*;
 public class SystemController extends BaseController{
 
     Logger logger= Logger.getLogger(SystemController.class.getName());
+    @Autowired
+    private QiniuService qiniuService;
 
 
 
@@ -77,9 +81,7 @@ public class SystemController extends BaseController{
     RetObj qiniu(HttpServletRequest request,HttpSession session)throws Exception
     {
         OutQiNiu qiNiu=new OutQiNiu();
-        qiNiu.setAccessKey(PropertiesUtil.getStringByKey("qiniu.AccessKey", "qiniu.properties"));
-        qiNiu.setSecretKey(PropertiesUtil.getStringByKey("qiniu.SecretKey", "qiniu.properties"));
-        qiNiu.setBucket(PropertiesUtil.getStringByKey("qiniu.bucketName", "qiniu.properties"));
+        qiNiu.setToken(qiniuService.getUpToken());
         qiNiu.setDomain(PropertiesUtil.getStringByKey("qiniu.domainName", "qiniu.properties"));
         RetObj retObj=new RetObj();
         RequestContext requestContext=new RequestContext(request);
@@ -88,8 +90,11 @@ public class SystemController extends BaseController{
         return retObj;
     }
 
+    public QiniuService getQiniuService() {
+        return qiniuService;
+    }
 
-
-
-
+    public void setQiniuService(QiniuService qiniuService) {
+        this.qiniuService = qiniuService;
+    }
 }

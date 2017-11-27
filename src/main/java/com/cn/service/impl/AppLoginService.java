@@ -1,5 +1,6 @@
 package com.cn.service.impl;
 
+import com.cn.constant.Status;
 import com.cn.dao.IAppLoginDao;
 import com.cn.model.AppLogin;
 
@@ -50,6 +51,7 @@ public class AppLoginService implements IAppLoginService {
     @Transactional(propagation= Propagation.REQUIRED,rollbackFor={RuntimeException.class, Exception.class},timeout=10,isolation= Isolation.SERIALIZABLE)
     public void  addApplogin( AppLogin appLogin,AppLogin lastAppLogin)throws Exception{
         if( lastAppLogin!=null) {
+            lastAppLogin.setStatus(String.valueOf(Status.INVALID.getIndex()));
             appLoginDao.update(lastAppLogin);
         }
         appLoginDao.insert(appLogin);

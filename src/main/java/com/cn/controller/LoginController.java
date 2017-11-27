@@ -2,6 +2,7 @@ package com.cn.controller;
 
 import com.cn.annotation.Config;
 import com.cn.annotation.JsonParam;
+import com.cn.constant.CustomerType;
 import com.cn.constant.Status;
 import com.cn.controller.token.TokenManager;
 import com.cn.controller.token.TokenModel;
@@ -9,14 +10,17 @@ import com.cn.model.AppLogin;
 import com.cn.model.Customer;
 
 import com.cn.param.InLogin;
+import com.cn.param.OutCustomer;
 import com.cn.service.IAppLoginService;
 import com.cn.service.ICustomerService;
 
 
+import com.cn.three.wx.WeichatService;
 import com.cn.util.IdGenerator;
 import com.cn.util.MD5Util;
 
 import com.cn.vo.RetObj;
+import org.apache.commons.beanutils.BeanUtils;
 import org.apache.log4j.Logger;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.context.annotation.Scope;
@@ -47,6 +51,8 @@ public class LoginController extends BaseController{
     private IAppLoginService appLoginService;
     @Autowired
     private TokenManager tokenManager;
+    @Autowired
+    private WeichatService weichatService;
 
 
 
@@ -70,9 +76,9 @@ public class LoginController extends BaseController{
      * 登录
      * @param
      * @param
-     *          loginName
-     * @param password
-     *          密码
+     *
+     * @param
+     *
      * @return
      */
     @RequestMapping(value="/login")
@@ -82,44 +88,49 @@ public class LoginController extends BaseController{
         //在Session里保存信息
         RetObj retObj=new RetObj();
         RequestContext requestContext=new RequestContext(request);
-        Customer  customer=new Customer();
-        Map map=new HashMap();
-        customer.setLoginName( inLogin.getLoginName());
-        Customer c=customerService.getCustomerByEntity( customer);
-        if(null!=c&&c.getPassword().equals(inLogin.getPassword())){
-            AppLogin lastAppLogin=new  AppLogin();
-            lastAppLogin.setCustomerId(c.getId());
-            lastAppLogin.setStatus(String.valueOf(Status.EFFECTIVE.getIndex()));
-            lastAppLogin=appLoginService.getLastApploginByEntity(lastAppLogin);
-            if( lastAppLogin!=null){
-                TokenModel  lastToken= tokenManager.getToken(lastAppLogin.getTokenId());
-                if(lastToken!=null) {
-                    tokenManager.deleteToken(lastToken.getToken());
+        String type=inLogin.getType();
+        if(type.equals(String.valueOf(CustomerType.MOBILE.getIndex()))) {
+            Customer customer = new Customer();
+            customer.setLoginName(inLogin.getLoginName());
+            Customer c = customerService.getCustomerByEntity(customer);
+            if (null != c) {
+                if (c.getPassword().equals(inLogin.getPwd())) {
+                    OutCustomer outCustomer=loginCommon(c);
+                    retObj.setData(outCustomer);
+                    retObj.setMsg(requestContext.getMessage("sys.prompt.success"));
+                } else {
+                    retObj.setCode(Status.INVALID.getIndex());
+                    retObj.setMsg(requestContext.getMessage("sys.customer.pwderror"));
                 }
+            } else {
+                retObj.setCode(Status.INVALID.getIndex());
+                retObj.setMsg(requestContext.getMessage("sys.customer.noperson"));
             }
-            TokenModel token=tokenManager.createToken(c);
-            AppLogin currentAppLogin=new  AppLogin();
+        }
+        if(type.equals(String.valueOf(CustomerType.WEICHAT.getIndex()))){
+            if(weichatService.isAccessTokenIsInvalid(inLogin.getPwd(),inLogin.getLoginName())){
+               Customer customer = new Customer();
+               customer.setLoginName(inLogin.getLoginName());
+               Customer c = customerService.getCustomerByEntity(customer);
+               if(c==null){
+                   customer.setId(IdGenerator.getId());
+                   customer.setPassword(inLogin.getPwd());
+                   customerService.addCustomer(customer);
+                   c=customer;
+               }
+               OutCustomer outCustomer=loginCommon(c);
+               retObj.setData(outCustomer);
+               retObj.setMsg(requestContext.getMessage("sys.prompt.success"));
 
-            currentAppLogin.setId(IdGenerator.getId());
-            currentAppLogin.setCustomerId(c.getId());
-            currentAppLogin.setCustomerName(c.getDisplayName());
-            currentAppLogin.setLoginTime(new Date());
-            currentAppLogin.setStatus(String.valueOf(Status.EFFECTIVE.getIndex()));
-            currentAppLogin.setTokenId(token.getToken());
-            lastAppLogin.setStatus(String.valueOf(Status.INVALID.getIndex()));
-            appLoginService.addApplogin(currentAppLogin, lastAppLogin);
-            map.put("customer",c);
-            map.put("token",token.getToken());
-            retObj.setData(map);
+           }else{
+               retObj.setCode(Status.INVALID.getIndex());
+               retObj.setMsg(requestContext.getMessage("sys.login.wxerror"));
+           }
 
 
-        }else{
-            retObj.setCode(Status.INVALID.getIndex());
-            retObj.setMsg(requestContext.getMessage("sys.prompt.fail"));
         }
 
-        retObj.setMsg(requestContext.getMessage("sys.prompt.success"));
-        return retObj;
+            return retObj;
 
 
     }
@@ -149,6 +160,33 @@ public class LoginController extends BaseController{
 
 
     }
+    private OutCustomer loginCommon(Customer c) throws Exception{
+        AppLogin lastAppLogin = new AppLogin();
+        lastAppLogin.setCustomerId(c.getId());
+        lastAppLogin.setStatus(String.valueOf(Status.EFFECTIVE.getIndex()));
+        lastAppLogin = appLoginService.getLastApploginByEntity(lastAppLogin);
+        if (lastAppLogin != null) {
+            TokenModel lastToken = tokenManager.getToken(lastAppLogin.getTokenId());
+            if (lastToken != null) {
+                tokenManager.deleteToken(lastToken.getToken());
+            }
+        }
+        TokenModel token = tokenManager.createToken(c);
+        AppLogin currentAppLogin = new AppLogin();
+
+        currentAppLogin.setId(IdGenerator.getId());
+        currentAppLogin.setCustomerId(c.getId());
+        currentAppLogin.setCustomerName(c.getDisplayName());
+        currentAppLogin.setLoginTime(new Date());
+        currentAppLogin.setStatus(String.valueOf(Status.EFFECTIVE.getIndex()));
+        currentAppLogin.setTokenId(token.getToken());
+        appLoginService.addApplogin(currentAppLogin, lastAppLogin);
+        OutCustomer outCustomer = new OutCustomer();
+        BeanUtils.copyProperties(outCustomer, c);
+        outCustomer.setName(c.getDisplayName());
+        outCustomer.setToken(token.getToken());
+        return   outCustomer;
+    }
 
 
     public ICustomerService getCustomerService() {
@@ -166,4 +204,13 @@ public class LoginController extends BaseController{
     public void setAppLoginService(IAppLoginService appLoginService) {
         this.appLoginService = appLoginService;
     }
+
+    public WeichatService getWeichatService() {
+        return weichatService;
+    }
+
+    public void setWeichatService(WeichatService weichatService) {
+        this.weichatService = weichatService;
+    }
 }
+

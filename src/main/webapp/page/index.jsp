@@ -5,7 +5,6 @@
 <head>
     <meta http-equiv="Content-Type" content="text/html; charset=UTF-8">
     <title>电子烟接口</title>
-    <%@include file="/page/common/header.jsp"%><!--静态包含-->
 </head>
 <body>
 API is Running

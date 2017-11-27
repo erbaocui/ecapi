@@ -9,7 +9,7 @@ import com.cn.model.Customer;
 public  interface   TokenManager {
 
    //int tokenExpireSeconds = 7 * 24 * 3600;
-   int tokenExpireSeconds =10*60;
+   int tokenExpireSeconds =24*3600;
     /**
      * 创建一个token关联上指定用户
      * @param userId 指定用户的id

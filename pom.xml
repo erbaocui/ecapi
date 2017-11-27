@@ -21,6 +21,8 @@
         <log4j2.version>2.6.2</log4j2.version>
         <project.basedir>D:/java/apache-maven-3.5.0/repository</project.basedir>
     </properties>
+
+
     <dependencies>
 
 
@@ -289,21 +291,59 @@
             <artifactId>qiniu-java-sdk</artifactId>
             <version>7.1.0</version>
         </dependency>
+        <!-- https://mvnrepository.com/artifact/commons-beanutils/commons-beanutils -->
+        <dependency>
+            <groupId>commons-beanutils</groupId>
+            <artifactId>commons-beanutils</artifactId>
+            <version>1.9.3</version>
+        </dependency>
 
 
     </dependencies>
+    <profiles>
+        <profile> <!-- 可以通过 -P ID 来激活 -->
+            <id>dev</id> <!-- ID 标识符 -->
+            <properties>
+                <env>dev</env> <!-- properties 定义 key-value, 这里 key 是 filter, value 是 PROD -->
+            </properties>
+            <activation>
+                <activeByDefault>true</activeByDefault> <!-- 默认激活 -->
+            </activation>
+        </profile>
+        <profile> <!-- 可以通过 -P ID 来激活 -->
+            <id>pro</id> <!-- ID 标识符 -->
+            <properties>
+                <env>pro</env> <!-- properties 定义 key-value, 这里 key 是 filter, value 是 PROD -->
+            </properties>
+
+
+        </profile>
+        <profile> <!-- 可以通过 -P ID 来激活 -->
+            <id>test</id> <!-- ID 标识符 -->
+            <properties>
+                <env>test</env> <!-- properties 定义 key-value, 这里 key 是 filter, value 是 TEST -->
+            </properties>
+
+        </profile>
+
+    </profiles>
+
     <build>
+
         <finalName>ecapi</finalName>
 
+        <filters> <!-- 指定使用的 filter -->
+            <filter>src/main/resources/filter/env_${env}.properties</filter>
+        </filters>
+        <resources>
+            <resource> <!-- 配置需要被替换的资源文件路径, db.properties 应该在 src/main/resource 目录下 -->
+                <directory>src/main/resources</directory>
+                <filtering>true</filtering> <!-- 是否使用过滤器 -->
+            </resource>
+
+        </resources>
         <plugins>
-            <plugin>
-                <groupId>org.mybatis.generator</groupId>
-                <artifactId>mybatis-generator-maven-plugin</artifactId>
-                <version>1.3.2</version>
-                <configuration>
-                    <verbose>true</verbose>
-                </configuration>
-            </plugin>
+
             <plugin>
                 <groupId>org.apache.maven.plugins</groupId>
                 <artifactId>maven-compiler-plugin</artifactId>
@@ -313,9 +353,41 @@
                     <target>1.8</target>
                 </configuration>
             </plugin>
+            <plugin>
+                <groupId>org.mybatis.generator</groupId>
+                <artifactId>mybatis-generator-maven-plugin</artifactId>
+                <version>1.3.2</version>
+                <configuration>
+                    <verbose>true</verbose>
+                    <overwrite>true</overwrite>
+                </configuration>
+            </plugin>
 
-
-
+           <!-- <plugin>
+                <groupId>org.apache.maven.plugins</groupId>
+                <artifactId>maven-war-plugin</artifactId>
+                <version>2.1.1</version>
+                <configuration>
+                    <archive>
+                        <addMavenDescriptor>false</addMavenDescriptor>
+                    </archive>
+                    <warName>${project.artifactId}</warName>
+                    <webResources>
+                        &lt;!&ndash; 不同的环境，使用不同的配置文件 &ndash;&gt;
+                       &lt;!&ndash; <resource>
+                            <directory>src/main/resources/filter/env_${env}.properties</directory>
+                            <targetPath>WEB-INF/classes</targetPath>
+                            <filtering>true</filtering>
+                        </resource>&ndash;&gt;
+                        &lt;!&ndash; 公共的配置文件 &ndash;&gt;
+                      &lt;!&ndash;  <resource>
+                            <directory>src/main/resources/public</directory>
+                            <targetPath>WEB-INF/classes</targetPath>
+                            <filtering>true</filtering>
+                        </resource>&ndash;&gt;
+                    </webResources>
+                </configuration>
+            </plugin>-->
         </plugins>
     </build>
 

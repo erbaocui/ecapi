@@ -5,7 +5,8 @@ package com.cn.param;
  */
 public class InLogin {
     private String loginName;
-    private String password;
+    private String pwd;
+    private String type;
 
     public InLogin() {
     }
@@ -18,11 +19,19 @@ public class InLogin {
         this.loginName = loginName;
     }
 
-    public String getPassword() {
-        return password;
+    public String getPwd() {
+        return pwd;
     }
 
-    public void setPassword(String password) {
-        this.password = password;
+    public void setPwd(String pwd) {
+        this.pwd = pwd;
+    }
+
+    public String getType() {
+        return type;
+    }
+
+    public void setType(String type) {
+        this.type = type;
     }
 }

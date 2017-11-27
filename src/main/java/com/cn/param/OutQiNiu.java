@@ -4,36 +4,18 @@ package com.cn.param;
  * Created by cuijp on 2017/11/21.
  */
 public class OutQiNiu {
-    private String accessKey;
-    private String secretKey;
-    private String bucket;
+    private String token;
     private String domain;
 
     public OutQiNiu() {
     }
 
-    public String getAccessKey() {
-        return accessKey;
+    public String getToken() {
+        return token;
     }
 
-    public void setAccessKey(String accessKey) {
-        this.accessKey = accessKey;
-    }
-
-    public String getSecretKey() {
-        return secretKey;
-    }
-
-    public void setSecretKey(String secretKey) {
-        this.secretKey = secretKey;
-    }
-
-    public String getBucket() {
-        return bucket;
-    }
-
-    public void setBucket(String bucket) {
-        this.bucket = bucket;
+    public void setToken(String token) {
+        this.token = token;
     }
 
     public String getDomain() {

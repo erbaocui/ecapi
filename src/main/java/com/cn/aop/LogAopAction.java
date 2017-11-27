@@ -56,7 +56,7 @@ public class LogAopAction {
      */
     @Before("controllerAspect()")
     public void doBefore(){
-        //System.out.println("开始");
+      //  System.out.println("开始");
     }
 
     /**
@@ -66,7 +66,7 @@ public class LogAopAction {
     public void after(){
 
 
-        //System.out.println("结束");
+       // System.out.println("结束");
     }
 
     /**
@@ -94,7 +94,7 @@ public class LogAopAction {
     @Around("controllerAspect()")
     public Object around(ProceedingJoinPoint pjp) throws Throwable{
         //日志实体对象
-        ActionLog log = new ActionLog();
+
         HttpServletRequest request = ((ServletRequestAttributes) RequestContextHolder.getRequestAttributes()).getRequest();
 
         // 拦截的实体类，就是当前正在执行的controller
@@ -128,6 +128,8 @@ public class LogAopAction {
             // 判断是否包含自定义的注解，说明一下这里的SystemLog就是我自己自定义的注解
             Annotation methodConfigAnnotation = method.getAnnotation(Config.class);
             if (methodConfigAnnotation != null) {
+                ActionLog log = new ActionLog();
+                log.setLoginIp(getIpAddr(request ));
                 Config config = method.getAnnotation(Config.class);
                 boolean interfaceLog = config.interfaceLog();
                 if (interfaceLog) {
@@ -184,7 +186,49 @@ public class LogAopAction {
                     }
                 }else{ object = pjp.proceed();}
 
-            }else{ object = pjp.proceed();}
+            }else{
+               /* String token=(String) request.getHeader("token");
+                TokenModel tokenModel=null;
+                Customer customer=null;
+                if(token!=null&&(!token.equals(""))){
+                    tokenModel= tokenManager.getToken(token);
+                }
+                if( tokenModel!=null){
+                    customer=tokenModel.getCustomer();
+                }
+                if(customer!=null){
+                    log.setLoginId(customer.getId());
+                    log.setLoginName(customer.getLoginName());
+                    log.setToken(token);
+                }
+                Map requestMap= requestParams(request);
+                log.setRequestParam(JSON.toJSONString(requestMap).toString());
+                //log.setLoginIp(getIp(request));
+                log.setActionUrl(request.getRequestURI());
+                long beginTime = new Date().getTime();
+                long endTime=0;
+                log.setActionTime( DateUtil.setTimeZone(new Date(beginTime)));
+                try {*/
+                    object = pjp.proceed();
+            /*    } catch (Exception e ) {
+                    endTime = new Date().getTime();
+                    log.setExecuteTime(String.valueOf(endTime - beginTime));
+                    log.setDescription("执行失败");
+                    log.setStatus(1);
+                    //log.setErrorStack(e.getStackTrace().toString());
+                    //String errorStack="";
+
+                    String fullStackTrace = ExceptionUtils.getStackTrace(e);
+                    log.setErrorStack(fullStackTrace);
+                    RequestContext requestContext=new RequestContext(request);
+                    RetObj retObj=new RetObj();
+                    retObj.setMsg(requestContext.getMessage("sys.prompt.paramerror"));
+                    retObj.setCode(Status.INVALID.getIndex());
+                    log.setResponseParam(JSON.toJSONString(retObj).toString());
+                    writeLog(log);
+                    throw e;
+                }*/
+            }
           } else{
             object = pjp.proceed();
            } /*else {//没有包含注解
@@ -262,6 +306,22 @@ public class LogAopAction {
         }
     return  map;
 
+    }
+    public String getIpAddr(HttpServletRequest request) {
+        String ip = request.getHeader("x-forwarded-for");
+        if(null == ip || 0 == ip.length() || "unknown".equalsIgnoreCase(ip)) {
+            ip = request.getHeader("Proxy-Client-IP");
+        }
+        if(null == ip || 0 == ip.length() || "unknown".equalsIgnoreCase(ip)) {
+            ip = request.getHeader("WL-Proxy-Client-IP");
+        }
+        if(null == ip || 0 == ip.length() || "unknown".equalsIgnoreCase(ip)) {
+            ip = request.getHeader("X-Real-IP");
+        }
+        if(null == ip || 0 == ip.length() || "unknown".equalsIgnoreCase(ip)) {
+            ip = request.getRemoteAddr();
+        }
+        return ip;
     }
 
 }

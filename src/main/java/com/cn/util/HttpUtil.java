@@ -103,7 +103,7 @@ public class HttpUtil {
         }
         apiUrl += param;
         String result = null;
-        HttpClient httpclient = new DefaultHttpClient();
+        HttpClient httpclient = HttpClients.createDefault();
         try {
             HttpGet httpPost = new HttpGet(apiUrl);
             HttpResponse response = httpclient.execute(httpPost);

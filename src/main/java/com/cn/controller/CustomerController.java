@@ -2,6 +2,7 @@ package com.cn.controller;
 
 import com.cn.annotation.Config;
 import com.cn.annotation.JsonParam;
+import com.cn.constant.CustomerType;
 import com.cn.constant.Mob;
 import com.cn.constant.Status;
 import com.cn.controller.token.TokenManager;
@@ -20,8 +21,11 @@ import org.apache.log4j.Logger;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.context.annotation.Scope;
 import org.springframework.stereotype.Controller;
+import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
+import org.springframework.web.bind.annotation.RequestMethod;
 import org.springframework.web.bind.annotation.ResponseBody;
+import org.springframework.web.servlet.ModelAndView;
 import org.springframework.web.servlet.support.RequestContext;
 
 import javax.servlet.http.HttpServletRequest;
@@ -61,10 +65,10 @@ public class CustomerController extends BaseController{
      *
      * @return listMenu json
      */
+    @ResponseBody
     @RequestMapping(value = "/register")
     @Config(methods = "register",module = "客户模块",needlogin = false,interfaceLog =true)
-    public @ResponseBody
-    RetObj regiest(@JsonParam InRegister inRegister,HttpServletRequest request)throws Exception
+    public RetObj register(@JsonParam InRegister inRegister,HttpServletRequest request)throws Exception
     {
         RetObj retObj=new RetObj();
         RequestContext requestContext=new RequestContext(request);
@@ -82,7 +86,9 @@ public class CustomerController extends BaseController{
             customer=new Customer();
             customer.setId(IdGenerator.getId());
             customer.setLoginName(inRegister.getPhone());
+            customer.setDisplayName(inRegister.getName());
             customer.setPassword(inRegister.getPwd());
+            customer.setType(String.valueOf(CustomerType.MOBILE.getIndex()));
             customer.setStatus("0");
             customerService.addCustomer(customer);
 
@@ -150,7 +156,6 @@ public class CustomerController extends BaseController{
         if(currentCustomer.getPassword().equals(inChgPwd.getOldpwd())){
             Customer customer=new Customer();
             customer.setId(currentCustomer.getId());
-            customer=new Customer();
             customer.setPassword(inChgPwd.getNewpwd());
             customerService.modifyCustomer(customer);
             tokenManager.deleteToken(token);

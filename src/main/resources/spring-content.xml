@@ -11,6 +11,7 @@
     <context:component-scan base-package="com.cn.service"/>
     <context:component-scan base-package="com.cn.dao"/>
     <context:component-scan base-package="com.cn.exception"/>
+    <context:component-scan base-package="com.cn.three"/>
 
 
 
@@ -22,18 +23,5 @@
     <import resource="classpath:spring-content-redis.xml"/>
     <import resource="classpath:spring-content-tx.xml"/>
     <import resource="classpath:spring-content-es.xml"/>
-
-  <!--  <bean class="org.springframework.web.servlet.mvc.method.annotation.RequestMappingHandlerAdapter">
-        &lt;!&ndash;线程安全的访问session&ndash;&gt;
-        <property name="synchronizeOnSession" value="true"/>
-        <property name="customArgumentResolvers">
-            <list>
-                <bean class="com.cn.annotation.RequestJsonParamMethodArgumentResolver"/>
-                <bean class="com.cn.annotation.FormModelMethodArgumentResolver"/>
-            </list>
-        </property>
-    </bean>-->
-
-
 
 </beans>
