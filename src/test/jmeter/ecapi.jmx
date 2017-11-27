@@ -53,7 +53,7 @@
             <collectionProp name="Arguments.arguments">
               <elementProp name="q" elementType="HTTPArgument">
                 <boolProp name="HTTPArgument.always_encode">true</boolProp>
-                <stringProp name="Argument.value">{&quot;loginName&quot;:&quot;18502682488&quot;,&quot;password&quot;:&quot;e10adc3949ba59abbe56e057f20f883e&quot;}</stringProp>
+                <stringProp name="Argument.value">{&quot;loginName&quot;:&quot;13811179500&quot;,&quot;pwd&quot;:&quot;96e79218965eb72c92a549dd5a330112&quot;,&quot;type&quot;:0}</stringProp>
                 <stringProp name="Argument.metadata">=</stringProp>
                 <boolProp name="HTTPArgument.use_equals">true</boolProp>
                 <stringProp name="Argument.name">q</stringProp>
@@ -179,12 +179,12 @@
             <stringProp name="HTTPSampler.response_timeout"></stringProp>
           </HTTPSamplerProxy>
           <hashTree/>
-          <HTTPSamplerProxy guiclass="HttpTestSampleGui" testclass="HTTPSamplerProxy" testname="更新" enabled="false">
+          <HTTPSamplerProxy guiclass="HttpTestSampleGui" testclass="HTTPSamplerProxy" testname="更新" enabled="true">
             <elementProp name="HTTPsampler.Arguments" elementType="Arguments" guiclass="HTTPArgumentsPanel" testclass="Arguments" testname="用户定义的变量" enabled="true">
               <collectionProp name="Arguments.arguments">
                 <elementProp name="q" elementType="HTTPArgument">
-                  <boolProp name="HTTPArgument.always_encode">true</boolProp>
-                  <stringProp name="Argument.value">{&quot;head&quot;:&quot;888&quot;,&quot;name&quot;:&quot;测试&quot;,&quot;gender&quot;:&quot;1&quot;,&quot;birthdate&quot;:1511451729,&quot;province&quot;:&quot;河北&quot;,&quot;city&quot;:&quot;承德&quot;,&quot;county&quot;,&quot;双桥区&quot;}</stringProp>
+                  <boolProp name="HTTPArgument.always_encode">false</boolProp>
+                  <stringProp name="Argument.value">%7B%22name%22%3A%22mlj04%22%2C%22county%22%3A%22%E5%BE%90%E6%B1%87%E5%8C%BA%22%2C%22header%22%3A%22http%3A%5C%2F%5C%2Foyz6r2siu.bkt.clouddn.com%5C%2Fuserheader_android_c0c52a0234cc4b3bb9584ddd3083268b_201711271839272770.jpg%22%2C%22gender%22%3A0%2C%22province%22%3A%22%E4%B8%8A%E6%B5%B7%22%2C%22birthdate%22%3A372960000000%2C%22city%22%3A%22%E5%B8%82%E8%BE%96%E5%8C%BA%22%7D</stringProp>
                   <stringProp name="Argument.metadata">=</stringProp>
                   <boolProp name="HTTPArgument.use_equals">true</boolProp>
                   <stringProp name="Argument.name">q</stringProp>
