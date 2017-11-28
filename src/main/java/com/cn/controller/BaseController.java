@@ -1,8 +1,12 @@
 package com.cn.controller;
 
 import com.alibaba.fastjson.JSON;
+import com.cn.controller.token.TokenManager;
+import com.cn.controller.token.TokenModel;
+import com.cn.model.Customer;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
+import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.web.bind.annotation.ExceptionHandler;
 import org.springframework.web.bind.annotation.ModelAttribute;
 
@@ -26,6 +30,8 @@ public abstract  class  BaseController {
     private static ThreadLocal<ServletResponse> currentResponse = new ThreadLocal<ServletResponse>();
 
     private org.apache.log4j.Logger errorlogger= org.apache.log4j.Logger.getLogger("Error");
+    @Autowired
+    private TokenManager tokenManager;
 
 
     @ModelAttribute
@@ -63,6 +69,11 @@ public abstract  class  BaseController {
             return null;
         }
     }*/
+    public Customer getCurrentCustomer(HttpServletRequest request){
+        String token=(String) request.getHeader("token");
+        TokenModel tokenModel=tokenManager.getToken(token);
+        return tokenModel.getCustomer();
+    }
 
     public HttpServletRequest request() {
         return (HttpServletRequest) currentRequest.get();
