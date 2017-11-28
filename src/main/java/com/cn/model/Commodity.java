@@ -64,6 +64,7 @@ public class Commodity {
     private String certified;
     private String speedRefund;
     private String sevenReturn;
+    private String thumb;
 
 
     /**
@@ -72,8 +73,8 @@ public class Commodity {
      *
      * @mbggenerated
      */
-    public Commodity(String id, String name, BigDecimal price, String brief, String status, Integer seq, String remark,String urlJd,String urlTmall,String certified,
-                     String speedRefund,String sevenReturn) {
+    public Commodity(String id, String name, BigDecimal price, String brief, String status, Integer seq, String remark, String urlJd, String urlTmall, String certified,
+                     String speedRefund, String sevenReturn, String thumb) {
         this.id = id;
         this.name = name;
         this.price = price;
@@ -86,6 +87,7 @@ public class Commodity {
         this.speedRefund=speedRefund;
         this. certified= certified;
         this.sevenReturn=sevenReturn;
+        this.thumb=thumb;
     }
 
     public Commodity() {
@@ -241,5 +243,13 @@ public class Commodity {
 
     public void setSevenReturn(String sevenReturn) {
         this.sevenReturn = sevenReturn;
+    }
+
+    public String getThumb() {
+        return thumb;
+    }
+
+    public void setThumb(String thumb) {
+        this.thumb = thumb;
     }
 }

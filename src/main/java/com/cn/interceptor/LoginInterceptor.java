@@ -78,7 +78,7 @@ public class LoginInterceptor implements HandlerInterceptor{
                     response.setContentType("application/json; charset=utf-8");
                     OutputStream out = response.getOutputStream();
                     RetObj retObj=new RetObj();
-                    retObj.setCode(Status.INVALID.getIndex());
+                    retObj.setCode(2);
                     retObj.setMsg(requestContext.getMessage("sys.prompt.needlogin"));
                     String data =  JSON.toJSONString(retObj);
                     out.write(data.getBytes("UTF-8"));

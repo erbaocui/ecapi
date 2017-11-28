@@ -94,7 +94,7 @@ public class CommodityController extends BaseController{
         Map map=new HashMap();
         map.put("total", Long.toString(p.getTotal()));
         map.put("rows",list);*/
-        PageHelper.startPage(1,0);
+        PageHelper.startPage(1,100);
         for(Commodity c:list){
             OutCommodity outCommodity=new OutCommodity();
             BeanUtils.copyProperties(outCommodity, c);
@@ -110,14 +110,6 @@ public class CommodityController extends BaseController{
                pics.add(p.getUrl());
             }
             outCommodity.setPics(pics);
-            picture.setType(String.valueOf(PicType.COMMODITY_THUMB.getIndex()));
-            picture.setRelationId(c.getId());
-             picList=pictureService.getPicturePageByEntity(picture);
-             List<String> thumb=new ArrayList<String>();
-            for(Picture p:picList){
-                thumb.add(p.getUrl());
-            }
-            outCommodity.setThumb(thumb);
             outList.add(outCommodity);
         }
         retObj.setData(outList);

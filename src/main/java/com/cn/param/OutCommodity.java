@@ -11,7 +11,7 @@ public class OutCommodity {
     private  String	name;
     private  String	brief;
     private   String price;
-    private   List<String> thumb;
+    private   String  thumb;
     private	   List<String> pics;
     private   String hint;
     private   String urlJd;
@@ -60,11 +60,11 @@ public class OutCommodity {
         this.price = price;
     }
 
-    public List<String> getThumb() {
+    public String getThumb() {
         return thumb;
     }
 
-    public void setThumb(List<String> thumb) {
+    public void setThumb(String thumb) {
         this.thumb = thumb;
     }
 
