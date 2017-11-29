@@ -66,7 +66,7 @@ public class FeedbackController extends BaseController{
      */
     @ResponseBody
     @RequestMapping(value = "/add")
-    @Config(methods = "add",module = "意见反馈",needlogin = false,interfaceLog =true)
+    @Config(methods = "add",module = "意见反馈",needlogin = true,interfaceLog =true)
     public RetObj add(@JsonParam InFeedBack inFeedBack,HttpServletRequest request)throws Exception
     {
         RetObj retObj=new RetObj();
