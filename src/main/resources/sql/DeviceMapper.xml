@@ -9,9 +9,8 @@
     <constructor >
       <idArg column="Id" jdbcType="VARCHAR" javaType="java.lang.String" />
       <arg column="name" jdbcType="VARCHAR" javaType="java.lang.String" />
-      <arg column="lat" jdbcType="VARCHAR" javaType="java.lang.String" />
-      <arg column="lon" jdbcType="VARCHAR" javaType="java.lang.String" />
-
+      <arg column="lat" jdbcType="DECIMAL" javaType="java.math.BigDecimal" />
+      <arg column="lon" jdbcType="DECIMAL" javaType="java.math.BigDecimal" />
     </constructor>
   </resultMap>
   <sql id="Base_Column_List" >
@@ -84,10 +83,10 @@
         #{name,jdbcType=VARCHAR},
       </if>
       <if test="lat != null" >
-        #{lat,jdbcType=VARCHAR},
+        #{lat,jdbcType=DECIMAL},
       </if>
       <if test="lon != null" >
-        #{lon,jdbcType=VARCHAR},
+        #{lon,jdbcType=DECIMAL},
       </if>
     </trim>
   </insert>
@@ -102,10 +101,10 @@
         name = #{name,jdbcType=VARCHAR},
       </if>
       <if test="lat != null" >
-        lat = #{lat,jdbcType=VARCHAR},
+        lat = #{lat,jdbcType=DECIMAL},
       </if>
       <if test="lon != null" >
-        lon = #{lon,jdbcType=VARCHAR},
+        lon = #{lon,jdbcType=DECIMAL},
       </if>
     </set>
     where Id = #{id,jdbcType=VARCHAR}

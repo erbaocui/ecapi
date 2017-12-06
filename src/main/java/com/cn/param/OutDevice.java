@@ -1,5 +1,6 @@
 package com.cn.param;
 
+import java.math.BigDecimal;
 import java.net.Inet4Address;
 
 /**
@@ -12,8 +13,8 @@ public class OutDevice {
     private Integer chargeCount;
     private Integer tar;
     private Integer co;
-    private String lat;
-    private String lon;
+    private BigDecimal lat;
+    private BigDecimal lon;
 
 
     public OutDevice() {
@@ -67,19 +68,19 @@ public class OutDevice {
         this.co = co;
     }
 
-    public String getLat() {
+    public BigDecimal getLat() {
         return lat;
     }
 
-    public void setLat(String lat) {
+    public void setLat(BigDecimal lat) {
         this.lat = lat;
     }
 
-    public String getLon() {
+    public BigDecimal getLon() {
         return lon;
     }
 
-    public void setLon(String lon) {
+    public void setLon(BigDecimal lon) {
         this.lon = lon;
     }
 }

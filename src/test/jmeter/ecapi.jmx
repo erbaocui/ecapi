@@ -44,7 +44,7 @@
               </elementProp>
             </collectionProp>
           </elementProp>
-          <stringProp name="HTTPSampler.domain">47.95.1.213</stringProp>
+          <stringProp name="HTTPSampler.domain">127.0.0.1</stringProp>
           <stringProp name="HTTPSampler.port">8080</stringProp>
           <stringProp name="HTTPSampler.protocol"></stringProp>
           <stringProp name="HTTPSampler.contentEncoding"></stringProp>
@@ -351,7 +351,7 @@
               <collectionProp name="Arguments.arguments">
                 <elementProp name="q" elementType="HTTPArgument">
                   <boolProp name="HTTPArgument.always_encode">true</boolProp>
-                  <stringProp name="Argument.value">{&quot;id&quot;:&quot;00-01-6C-06-A6-29&quot;,&quot;lat&quot;:&quot;12.33&quot;,&quot;lon&quot;:&quot;33.33&quot;}</stringProp>
+                  <stringProp name="Argument.value">{&quot;id&quot;:&quot;00-01-6C-06-A6-29&quot;,&quot;lat&quot;:12.33,&quot;lon&quot;:33.33}</stringProp>
                   <stringProp name="Argument.metadata">=</stringProp>
                   <boolProp name="HTTPArgument.use_equals">true</boolProp>
                   <stringProp name="Argument.name">q</stringProp>
@@ -396,7 +396,7 @@
             <elementProp name="HTTPsampler.Arguments" elementType="Arguments" guiclass="HTTPArgumentsPanel" testclass="Arguments" testname="用户定义的变量" enabled="true">
               <collectionProp name="Arguments.arguments">
                 <elementProp name="q" elementType="HTTPArgument">
-                  <boolProp name="HTTPArgument.always_encode">false</boolProp>
+                  <boolProp name="HTTPArgument.always_encode">true</boolProp>
                   <stringProp name="Argument.value">{&quot;id&quot;:&quot;00-01-6C-06-A6-29&quot;}</stringProp>
                   <stringProp name="Argument.metadata">=</stringProp>
                   <boolProp name="HTTPArgument.use_equals">true</boolProp>

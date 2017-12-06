@@ -16,8 +16,8 @@
     <association property="device" javaType="com.cn.model.Device">
       <id column="device_id"  property="id" jdbcType="VARCHAR" javaType="java.lang.String" />
       <result column="device_name"  property="name" jdbcType="VARCHAR" javaType="java.lang.String" />
-      <result column="device_lat"  property="lat" jdbcType="VARCHAR" javaType="java.lang.String" />
-      <result column="device_lon"  property="lon" jdbcType="VARCHAR" javaType="java.lang.String" />
+      <result column="device_lat"  property="lat"  jdbcType="DECIMAL" javaType="java.math.BigDecimal" />
+      <result column="device_lon"  property="lon"  jdbcType="DECIMAL" javaType="java.math.BigDecimal" />
     </association>
     <association property="customer" javaType="com.cn.model.Customer">
       <id column="customer_id"  property="id" jdbcType="VARCHAR" javaType="java.lang.String" />
