@@ -1,0 +1,28 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd" >
+<mapper namespace="com.cn.dao.StatisticsMapper" >
+    <resultMap id="resultMap"     type="com.cn.vo.Statistics" >
+
+        <result property="useTime" column="use_time"/>
+        <result property="useNo" column="use_no"/>
+        <result property="durationTime" column="duration_time"/>
+
+    </resultMap>
+
+      <select id="selectDay" parameterType="java.util.Map"  resultMap="resultMap" statementType="CALLABLE" >
+
+             {call p_statistics_current_day(#{v_customer_id,jdbcType=VARCHAR,mode=IN})}
+
+      </select>
+    <select id="selectWeek" parameterType="java.util.Map"  resultMap="resultMap" statementType="CALLABLE" >
+
+        {call p_statistics_current_week(#{v_customer_id,jdbcType=VARCHAR,mode=IN})}
+
+    </select>
+    <select id="selectMonth" parameterType="java.util.Map"  resultMap="resultMap" statementType="CALLABLE" >
+
+        {call p_statistics_current_month(#{v_customer_id,jdbcType=VARCHAR,mode=IN})}
+
+    </select>
+
+</mapper>
