@@ -10,13 +10,12 @@ import com.cn.constant.Status;
 import com.cn.model.*;
 
 import com.cn.param.*;
-import com.cn.service.ICustomerDeviceService;
-import com.cn.service.ICustomerService;
-import com.cn.service.IDeviceService;
-import com.cn.service.IRecordService;
+import com.cn.service.*;
 import com.cn.three.sms.SmsVerifyKit;
+import com.cn.util.CoodinateCovertor;
 import com.cn.util.DateUtil;
 import com.cn.util.IdGenerator;
+import com.cn.util.LngLat;
 import com.cn.vo.RetObj;
 import com.github.pagehelper.PageHelper;
 import org.apache.commons.beanutils.BeanUtils;
@@ -51,6 +50,8 @@ public class DeviceController extends BaseController{
     private ICustomerDeviceService customerDeviceService;
     @Autowired
     private IRecordService recordService;
+    @Autowired
+    private IParamService paramService;
 
 
 
@@ -155,7 +156,7 @@ public class DeviceController extends BaseController{
         List<OutBindDevice>  outList=new ArrayList<OutBindDevice>();
         for(CustomerDevice cd:list){
             OutBindDevice   outBindDevice=new OutBindDevice();
-            outBindDevice.setId(cd.getId());
+            outBindDevice.setId(cd.getDevice().getId());
             outBindDevice.setName(cd.getDevice().getName());
             outList.add(outBindDevice);
         }
@@ -173,33 +174,150 @@ public class DeviceController extends BaseController{
     @ResponseBody
     @RequestMapping(value = "/info")
     @Config(methods = "info",module = "设备模块",needlogin =true,interfaceLog =true)
-    public RetObj info(@JsonParam InDevice inDevice,HttpServletRequest request)throws Exception
-    {
-        RetObj retObj=new RetObj();
-        RequestContext requestContext=new RequestContext(request);
-        Device device=new Device();
+    public RetObj info(@JsonParam InDevice inDevice,HttpServletRequest request)throws Exception {
+        RetObj retObj = new RetObj();
+        RequestContext requestContext = new RequestContext(request);
+        Device device = new Device();
         device.setId(inDevice.getId());
-        CustomerDevice customerDevice=new CustomerDevice();
+        CustomerDevice customerDevice = new CustomerDevice();
         customerDevice.setDevice(device);
         customerDevice.setCustomer(getCurrentCustomer(request));
 
-        CustomerDevice  cd=customerDeviceService.getCustomerDeviceByEntity(customerDevice);
-        if(cd!=null){
-            OutDevice outDevice=new OutDevice();
+        CustomerDevice cd = customerDeviceService.getCustomerDeviceByEntity(customerDevice);
+        if (cd != null) {
+            OutDevice outDevice = new OutDevice();
             outDevice.setName(cd.getDevice().getName());
-            outDevice.setId(cd.getId());
-            outDevice.setLon(cd.getDevice().getLon());
-            outDevice.setLat(cd.getDevice().getLat());
-            outDevice.setUseCount(cd.getUseCount());
-            outDevice.setChargeCount(cd.getChargeCount());
-            outDevice.setCo(cd.getUseCount());
-            outDevice.setTar(cd.getUseCount());
+            outDevice.setId(cd.getDevice().getId());
+            if (cd.getDevice().getLon() != null){
+                outDevice.setLon(cd.getDevice().getLon().doubleValue());
+             }
+            if (cd.getDevice().getLat() != null){
+               outDevice.setLat(cd.getDevice().getLat().doubleValue());
+            }
+            if(cd.getDevice().getLon() != null&&cd.getDevice().getLat() != null){
+                LngLat lngLat=new LngLat();
+                lngLat.setLantitude(cd.getDevice().getLat().doubleValue());
+                lngLat.setLongitude(cd.getDevice().getLon().doubleValue());
+                lngLat= CoodinateCovertor.bd_encrypt(lngLat);
+                outDevice.setBaiduLat(lngLat.getLantitude());
+                outDevice.setBaiduLon(lngLat.getLongitude());
+            }
+            if (cd.getUseCount()!= null){
+                outDevice.setUseCount(cd.getUseCount());
+            }
+            if (cd.getChargeCount()!= null){
+                outDevice.setChargeCount(cd.getChargeCount());
+            }
+            Param param=null;
+            //一氧化氮
+            param=new Param();
+            param.setKv("co");
+            param=paramService.getParamByEntity(param);
+            int coRate=1;
+            if(param.getValue()!=null){
+                coRate=Integer.valueOf(param.getValue());
+            }
+            outDevice.setCo(outDevice.getUseCount()*coRate);
+            //焦油
+            param=new Param();
+            param.setKv("tar");
+            param=paramService.getParamByEntity(param);
+            int tarRate=1;
+            if(param.getValue()!=null){
+                    tarRate=Integer.valueOf(param.getValue());
+            }
+            outDevice.setTar(outDevice.getUseCount()*tarRate);
+            //app 分享Icon
+            param=new Param();
+            param.setKv("app_share_icon");
+            param=paramService.getParamByEntity(param);
+            outDevice.setAppShareIcon(param.getValue());
+            //app分享title
+            param=new Param();
+            param.setKv("use_time");
+            param=paramService.getParamByEntity(param);
+            int useTime=Integer.valueOf(param.getValue());
+             useTime=useTime*outDevice.getUseCount();
+            param=new Param();
+            param.setKv("app_share_title");
+            param=paramService.getParamByEntity(param);
+            String appShareTitle=param.getValue();
+            appShareTitle=appShareTitle.replace("${useTime}",String.valueOf(useTime));
+            outDevice.setAppShareTitle(appShareTitle);
+            //app 分享content
+            param=new Param();
+            param.setKv("app_share_content");
+            param=paramService.getParamByEntity(param);
+            String  appShareContent=param.getValue();
+            appShareContent=appShareContent.replace("${tar}",String.valueOf( outDevice.getTar()));
+            outDevice.setAppShareContent(appShareContent);
+            //分享Icon
+            param=new Param();
+            param.setKv("share_icon");
+            param=paramService.getParamByEntity(param);
+            outDevice.setShareIcon(param.getValue());
+            //app分享title
+            param=new Param();
+            param.setKv("share_title");
+            param=paramService.getParamByEntity(param);
+            String shareTitle=param.getValue();
+            shareTitle=shareTitle.replace("${useTime}",String.valueOf(useTime));
+            outDevice.setShareTitle(shareTitle);
+            //分享内容
+            param=new Param();
+            param.setKv("share_content");
+            param=paramService.getParamByEntity(param);
+            String  shareContent=param.getValue();
+            shareContent=shareContent.replace("${tar}",String.valueOf( outDevice.getTar()));
+            outDevice.setShareContent(shareContent);
+            //分享url
+            param=new Param();
+            param.setKv("share_url");
+            param=paramService.getParamByEntity(param);
+            outDevice.setShareUrl(param.getValue());
             retObj.setData(outDevice);
             retObj.setMsg(requestContext.getMessage("sys.prompt.success"));
-        }else{
+        } else {
             retObj.setCode(Status.INVALID.getIndex());
             retObj.setMsg(requestContext.getMessage("sys.device.noexist"));
         }
+
+        return retObj;
+
+    }
+
+    /**
+     * 商城入口
+     * @param
+     *
+     * @return  RetObj json
+     */
+    @ResponseBody
+    @RequestMapping(value = "/mall")
+    @Config(methods = "mall",module = "设备模块",needlogin =true,interfaceLog =true)
+    public RetObj mall(HttpServletRequest request)throws Exception {
+        RetObj retObj = new RetObj();
+        RequestContext requestContext = new RequestContext(request);
+        Param  param=null;
+        OutMall outMall=new OutMall();
+        //商城Icon
+         param=new Param();
+         param.setKv("mall_icon");
+         param=paramService.getParamByEntity(param);
+         outMall.setMallIcon(param.getValue());
+         //商城title
+         param=new Param();
+        param.setKv("mall_title");
+        param=paramService.getParamByEntity(param);
+        outMall.setMallTitle(param.getValue());
+        //分享内容
+        param=new Param();
+        param.setKv("mall_content");
+        param=paramService.getParamByEntity(param);
+        outMall.setMallContent(param.getValue());
+        retObj.setData( outMall);
+
+        retObj.setMsg(requestContext.getMessage("sys.prompt.success"));
 
         return retObj;
 
@@ -285,7 +403,15 @@ public class DeviceController extends BaseController{
         this.deviceService = deviceService;
     }
 
-   public static  void  main(String args[]){
+    public IParamService getParamService() {
+        return paramService;
+    }
+
+    public void setParamService(IParamService paramService) {
+        this.paramService = paramService;
+    }
+
+    public static  void  main(String args[]){
      System.out.println(DateUtil.convert2Date("2017-12-4 16:11:11", "yyyy-MM-dd HH:mm:ss").getTime());
    }
 }
