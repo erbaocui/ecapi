@@ -78,6 +78,7 @@ public class MessageController extends BaseController{
         }
 
         MessageEx message=new MessageEx();
+        message.setStatus("0");
         List<OutMessageList> outList=new ArrayList<OutMessageList>();
         List<Message> list=messageService.getMessagePageByEntity(message);
 
