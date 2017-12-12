@@ -15,6 +15,7 @@ import java.util.Map;
  */
 @Service("weichatService ")
 public class WeichatService {
+
     public static final String  USER_INFO_URL= "https://api.weixin.qq.com/sns/userinfo";
     public static final String  CHECK_URL=  "https://api.weixin.qq.com/sns/auth";
 
@@ -72,10 +73,12 @@ public class WeichatService {
     }
 
     public static void main (String  args[]){
-        String accessToken ="B3A5107738D24D868E000103CB4C4504";
-        String     openID="DF395AE9D8361FAA2605DA5E51B8647B";
+        String accessToken ="7D7BE073A3F3800ED4D1A2E6D5F0F0E4";
+        String     openID="E69264E4564A5D73D3DF1989996864B8";
+       /* String   openID ="7D7BE073A3F3800ED4D1A2E6D5F0F0E4";
+        String   accessToken="E69264E4564A5D73D3DF1989996864B8";*/
         Integer expires_in =7200;
-        //WeichatUtil.isAccessTokenIsInvalid(accessToken, openID);
+        new WeichatService().isAccessTokenIsInvalid(accessToken, openID);
         //WeichatService.getUserInfo(accessToken, openID);
     }
 

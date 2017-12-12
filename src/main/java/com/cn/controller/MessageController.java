@@ -90,11 +90,9 @@ public class MessageController extends BaseController{
             outList.add( outMessageList);
         }
 
-        PageInfo<Message> p=new PageInfo<Message>(list);
-        Map map=new HashMap();
-        map.put("total", Long.toString(p.getTotal()));
-        map.put("rows",outList);
-        retObj.setData(map);
+        //PageInfo<Message> p=new PageInfo<Message>(list);
+
+        retObj.setData(outList);
         retObj.setMsg(requestContext.getMessage("sys.prompt.success"));
         return retObj;
     }

@@ -7,7 +7,9 @@ public class QQUserInfo {
     private String accessToken;
     private String openId;
     private String nickname;
-    private String sex;
+    private String province;
+    private String city;
+    private String gender;
     private String userImg;
 
     public QQUserInfo() {
@@ -37,12 +39,12 @@ public class QQUserInfo {
         this.nickname = nickname;
     }
 
-    public String getSex() {
-        return sex;
+    public String getGender() {
+        return gender;
     }
 
-    public void setSex(String sex) {
-        this.sex = sex;
+    public void setGender(String gender) {
+        this.gender = gender;
     }
 
     public String getUserImg() {
@@ -51,5 +53,21 @@ public class QQUserInfo {
 
     public void setUserImg(String userImg) {
         this.userImg = userImg;
+    }
+
+    public String getProvince() {
+        return province;
+    }
+
+    public void setProvince(String province) {
+        this.province = province;
+    }
+
+    public String getCity() {
+        return city;
+    }
+
+    public void setCity(String city) {
+        this.city = city;
     }
 }

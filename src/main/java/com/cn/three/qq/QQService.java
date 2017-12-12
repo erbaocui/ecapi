@@ -15,27 +15,26 @@ import java.util.Map;
 @Service("qqService ")
 public class QQService {
     public static final String  USER_INFO_URL= "https://graph.qq.com/user/get_user_info";
-    public static final String  CHECK_URL=  "https://api.weixin.qq.com/sns/auth";
 
-  public QQUserInfo getUserInfo(String accessToken,String openId) {
-            if(!isAccessTokenIsInvalid( accessToken,openId)){
-                return null;
-            }
+  public QQUserInfo getUserInfo(String accessToken,String openId,String appid) {
 
             try {
                 Map<String,Object> param=new HashMap<String,Object>();
                 param.put("access_token",accessToken);
                 param.put("openid",openId);
+                param.put("oauth_consumer_key",appid);
                 String response=HttpUtil.doGet(USER_INFO_URL,param);
                 JSONObject obj= JSON.parseObject( response);
-                int errorCode =  obj.getIntValue("errcode");
-                if (errorCode == 0) {
+                int ret =  obj.getIntValue("ret");
+                if (ret == 0) {
                     QQUserInfo userInfo = new QQUserInfo();
                     userInfo.setOpenId(openId);
                     userInfo.setAccessToken(accessToken);
                     userInfo.setNickname(obj.getString("nickname"));
-                    userInfo.setSex(obj.getString("sex"));
-                    userInfo.setUserImg(obj.getString("headimgurl"));
+                    userInfo.setProvince(obj.getString("province"));
+                    userInfo.setCity(obj.getString("city"));
+                    userInfo.setGender(obj.getString("gender"));
+                    userInfo.setUserImg(obj.getString("figureurl_qq_1"));
                     return userInfo;
                 }
 
@@ -48,34 +47,14 @@ public class QQService {
         }
 
 
-    public boolean isAccessTokenIsInvalid(String accessToken,String openId) {
 
 
-        try {
-
-            Map<String,Object> param=new HashMap<String,Object>();
-            param.put("access_token",accessToken);
-            param.put("openid",openId);
-            String response=HttpUtil.doGet(CHECK_URL,param);
-            JSONObject obj= JSON.parseObject( response);
-            int errorCode =  obj.getIntValue("errcode");
-            if (errorCode == 0) {
-                    return true;
-            }
-
-        } catch (JSONException e) {
-            // TODO Auto-generated catch block
-            e.printStackTrace();
-        }
-        return false;
-    }
-
-    public static void main (String  args[]){
-        String accessToken ="B3A5107738D24D868E000103CB4C4504";
-        String     openID="DF395AE9D8361FAA2605DA5E51B8647B";
+  /*  public static void main (String  args[]){
+        String accessToken ="9BA4E5F2E55AB80184DCF73F8B1ED552";
+        String     openID="4A37C24A9446E450082A3861A7669033";
         Integer expires_in =7200;
-        //WeichatUtil.isAccessTokenIsInvalid(accessToken, openID);
+        //new QQService().getUserInfo(accessToken, openID);
         //WeichatService.getUserInfo(accessToken, openID);
-    }
+    }*/
 
 }

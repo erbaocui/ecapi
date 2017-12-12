@@ -3,6 +3,7 @@ package com.cn.controller;
 import com.cn.annotation.Config;
 import com.cn.annotation.JsonParam;
 import com.cn.constant.CustomerType;
+import com.cn.constant.QQ;
 import com.cn.constant.Status;
 import com.cn.controller.token.TokenManager;
 import com.cn.controller.token.TokenModel;
@@ -15,6 +16,8 @@ import com.cn.service.IAppLoginService;
 import com.cn.service.ICustomerService;
 
 
+import com.cn.three.qq.QQService;
+import com.cn.three.qq.QQUserInfo;
 import com.cn.three.wx.WeichatService;
 import com.cn.util.IdGenerator;
 import com.cn.util.MD5Util;
@@ -53,6 +56,8 @@ public class LoginController extends BaseController{
     private TokenManager tokenManager;
     @Autowired
     private WeichatService weichatService;
+    @Autowired
+    private QQService qqService;
 
 
 
@@ -126,6 +131,55 @@ public class LoginController extends BaseController{
                retObj.setCode(Status.INVALID.getIndex());
                retObj.setMsg(requestContext.getMessage("sys.login.wxerror"));
            }
+
+
+        }
+        if(type.equals(String.valueOf(CustomerType.QQ.getIndex()))){
+            int mobileType=Integer.valueOf(request.getHeader("type"));
+            String appid="";
+            if(mobileType==0){
+                appid= QQ.ANDRIOD_APP_ID;
+            }
+            if(mobileType==1){
+                appid= QQ.IOS_APP_ID;
+            }
+            QQUserInfo  qquser=qqService.getUserInfo(inLogin.getPwd(), inLogin.getLoginName(),appid);
+            if(qquser!=null){
+                Customer customer = new Customer();
+                customer.setLoginName(inLogin.getLoginName());
+                Customer c = customerService.getCustomerByEntity(customer);
+                if(c==null){
+                    customer.setId(IdGenerator.getId());
+                    customer.setLoginName(inLogin.getLoginName());
+                    customer.setPassword(inLogin.getPwd());
+                    customer.setHead(qquser.getUserImg());
+                    customer.setGender(qquser.getGender());
+                    customer.setType("2");
+                    customer.setDisplayName(qquser.getNickname());
+                    customer.setCity(qquser.getCity());
+                    customer.setProvince(qquser.getProvince());
+                    customer.setStatus("0");
+                    customerService.addCustomer(customer);
+
+                }else{
+                    customer.setId(c.getId());
+                    customer.setPassword(inLogin.getPwd());
+                    customer.setHead(qquser.getUserImg());
+                    customer.setGender(qquser.getGender());
+                    customer.setDisplayName(qquser.getNickname());
+                    customer.setCity(qquser.getCity());
+                    customer.setProvince(qquser.getProvince());
+                    customerService.modifyCustomer(customer);
+
+                }
+                OutCustomer outCustomer=loginCommon(customer);
+                retObj.setData(outCustomer);
+                retObj.setMsg(requestContext.getMessage("sys.prompt.success"));
+
+            }else{
+                retObj.setCode(Status.INVALID.getIndex());
+                retObj.setMsg(requestContext.getMessage("sys.login.qqerror"));
+            }
 
 
         }
