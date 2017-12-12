@@ -7,8 +7,10 @@ public class WeichatUserInfo {
     private String accessToken;
     private String openId;
     private String nickname;
-    private String sex;
+    private Integer sex;
     private String userImg;
+    private String province;
+    private String city;
 
     public WeichatUserInfo() {
     }
@@ -37,11 +39,11 @@ public class WeichatUserInfo {
         this.nickname = nickname;
     }
 
-    public String getSex() {
+    public Integer getSex() {
         return sex;
     }
 
-    public void setSex(String sex) {
+    public void setSex(Integer sex) {
         this.sex = sex;
     }
 
@@ -51,5 +53,21 @@ public class WeichatUserInfo {
 
     public void setUserImg(String userImg) {
         this.userImg = userImg;
+    }
+
+    public String getProvince() {
+        return province;
+    }
+
+    public void setProvince(String province) {
+        this.province = province;
+    }
+
+    public String getCity() {
+        return city;
+    }
+
+    public void setCity(String city) {
+        this.city = city;
     }
 }

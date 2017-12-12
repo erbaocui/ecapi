@@ -30,16 +30,16 @@ public class WeichatService {
                 param.put("openid",openId);
                 String response=HttpUtil.doGet(USER_INFO_URL,param);
                 JSONObject obj= JSON.parseObject( response);
-                int errorCode =  obj.getIntValue("errcode");
-                if (errorCode == 0) {
-                    WeichatUserInfo userInfo = new  WeichatUserInfo();
-                    userInfo.setOpenId(openId);
-                    userInfo.setAccessToken(accessToken);
-                    userInfo.setNickname(obj.getString("nickname"));
-                    userInfo.setSex(obj.getString("sex"));
-                    userInfo.setUserImg(obj.getString("headimgurl"));
-                    return userInfo;
-                }
+                WeichatUserInfo userInfo = new  WeichatUserInfo();
+                userInfo.setOpenId(openId);
+                userInfo.setAccessToken(accessToken);
+                userInfo.setNickname(obj.getString("nickname"));
+                userInfo.setSex(obj.getInteger("sex"));
+                userInfo.setUserImg(obj.getString("headimgurl"));
+                userInfo.setProvince(obj.getString("province"));
+                userInfo.setCity(obj.getString("province"));
+                return userInfo;
+
 
 
             }  catch (JSONException e) {
@@ -73,13 +73,13 @@ public class WeichatService {
     }
 
     public static void main (String  args[]){
-        String accessToken ="7D7BE073A3F3800ED4D1A2E6D5F0F0E4";
-        String     openID="E69264E4564A5D73D3DF1989996864B8";
+        String accessToken ="4_DHw4Yt5DTVanx2sseSUsVhZxC58QrqqIOqAoONY6K7htDHaEdSLhFBqQNGacmSu3UAuZtt3nCryYKTmWSJ3swf2yEnSKOpyF0XgGDlxs2Po";
+        String     openID="odnibwlp7DdR_EVzsLwcQL3dV1Dw";
        /* String   openID ="7D7BE073A3F3800ED4D1A2E6D5F0F0E4";
         String   accessToken="E69264E4564A5D73D3DF1989996864B8";*/
         Integer expires_in =7200;
-        new WeichatService().isAccessTokenIsInvalid(accessToken, openID);
-        //WeichatService.getUserInfo(accessToken, openID);
+        //new WeichatService().isAccessTokenIsInvalid(accessToken, openID);
+        WeichatUserInfo weichatUserInfo=new WeichatService().getUserInfo(accessToken, openID);
     }
 
 }

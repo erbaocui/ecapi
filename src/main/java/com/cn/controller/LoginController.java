@@ -19,6 +19,7 @@ import com.cn.service.ICustomerService;
 import com.cn.three.qq.QQService;
 import com.cn.three.qq.QQUserInfo;
 import com.cn.three.wx.WeichatService;
+import com.cn.three.wx.WeichatUserInfo;
 import com.cn.util.IdGenerator;
 import com.cn.util.MD5Util;
 
@@ -113,24 +114,52 @@ public class LoginController extends BaseController{
             }
         }
         if(type.equals(String.valueOf(CustomerType.WEICHAT.getIndex()))){
-            if(weichatService.isAccessTokenIsInvalid(inLogin.getPwd(),inLogin.getLoginName())){
-               Customer customer = new Customer();
-               customer.setLoginName(inLogin.getLoginName());
-               Customer c = customerService.getCustomerByEntity(customer);
-               if(c==null){
-                   customer.setId(IdGenerator.getId());
-                   customer.setPassword(inLogin.getPwd());
-                   customerService.addCustomer(customer);
-                   c=customer;
-               }
-               OutCustomer outCustomer=loginCommon(c);
-               retObj.setData(outCustomer);
-               retObj.setMsg(requestContext.getMessage("sys.prompt.success"));
+            WeichatUserInfo wxuser=weichatService.getUserInfo(inLogin.getPwd(),inLogin.getLoginName());
+            if(wxuser!=null){
+                Customer customer = new Customer();
+                customer.setLoginName(inLogin.getLoginName());
+                Customer c = customerService.getCustomerByEntity(customer);
+                if(c==null){
+                    customer.setId(IdGenerator.getId());
+                    customer.setLoginName(inLogin.getLoginName());
+                    customer.setPassword(inLogin.getPwd());
+                    customer.setHead(wxuser.getUserImg());
+                    if(wxuser.getSex().equals(0)){
+                        customer.setGender("1");
+                    }else{
+                        customer.setGender("0");
+                    }
+                    customer.setType("1");
+                    customer.setDisplayName(wxuser.getNickname());
+                    customer.setCity(wxuser.getCity());
+                    customer.setProvince(wxuser.getProvince());
+                    customer.setStatus("0");
+                    customerService.addCustomer(customer);
 
-           }else{
-               retObj.setCode(Status.INVALID.getIndex());
-               retObj.setMsg(requestContext.getMessage("sys.login.wxerror"));
-           }
+                }else{
+                    customer.setId(c.getId());
+                    customer.setPassword(inLogin.getPwd());
+                    customer.setHead(wxuser.getUserImg());
+                    if(wxuser.getSex().equals(0)){
+                        customer.setGender("1");
+                    }else{
+                        customer.setGender("0");
+                    }
+                    customer.setDisplayName(wxuser.getNickname());
+                    customer.setCity(wxuser.getCity());
+                    customer.setProvince(wxuser.getProvince());
+                    customerService.modifyCustomer(customer);
+
+                }
+                OutCustomer outCustomer=loginCommon(customer);
+                retObj.setData(outCustomer);
+                retObj.setMsg(requestContext.getMessage("sys.prompt.success"));
+
+            }else{
+                retObj.setCode(Status.INVALID.getIndex());
+                retObj.setMsg(requestContext.getMessage("sys.login.wxerror"));
+            }
+
 
 
         }
@@ -153,6 +182,11 @@ public class LoginController extends BaseController{
                     customer.setLoginName(inLogin.getLoginName());
                     customer.setPassword(inLogin.getPwd());
                     customer.setHead(qquser.getUserImg());
+                    if(qquser.getGender().equals("男")){
+                        customer.setGender("0");
+                    }else{
+                        customer.setGender("1");
+                    }
                     customer.setGender(qquser.getGender());
                     customer.setType("2");
                     customer.setDisplayName(qquser.getNickname());
@@ -165,7 +199,11 @@ public class LoginController extends BaseController{
                     customer.setId(c.getId());
                     customer.setPassword(inLogin.getPwd());
                     customer.setHead(qquser.getUserImg());
-                    customer.setGender(qquser.getGender());
+                    if(qquser.getGender().equals("男")){
+                        customer.setGender("0");
+                    }else{
+                        customer.setGender("1");
+                    }
                     customer.setDisplayName(qquser.getNickname());
                     customer.setCity(qquser.getCity());
                     customer.setProvince(qquser.getProvince());
@@ -239,6 +277,7 @@ public class LoginController extends BaseController{
         BeanUtils.copyProperties(outCustomer, c);
         outCustomer.setName(c.getDisplayName());
         outCustomer.setToken(token.getToken());
+        outCustomer.setType(c.getType());
         return   outCustomer;
     }
 
