@@ -109,6 +109,7 @@ public class CommodityController extends BaseController{
             for(Picture p:picList){
                pics.add(p.getUrl());
             }
+            outCommodity.setPrice(outCommodity.getPrice()+"￥");
             outCommodity.setPics(pics);
             outList.add(outCommodity);
         }
