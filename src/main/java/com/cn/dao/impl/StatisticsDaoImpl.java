@@ -35,4 +35,11 @@ public class StatisticsDaoImpl extends BaseDaoImpl implements IStatisticsDao {
         queryMap.put("v_customer_id", customerId);
         return (List<Statistics>)list("com.cn.dao.StatisticsMapper.selectWeek", queryMap);
     }
+
+    @Override
+    public Integer all(String customerId) {
+        Map queryMap = new HashMap();
+        queryMap.put("v_customer_id", customerId);
+        return (Integer)findObject("com.cn.dao.StatisticsMapper.selectAll", queryMap);
+    }
 }

@@ -19,9 +19,10 @@
         {call p_statistics_current_week(#{v_customer_id,jdbcType=VARCHAR,mode=IN})}
 
     </select>
-    <select id="selectMonth" parameterType="java.util.Map"  resultMap="resultMap" statementType="CALLABLE" >
+    <select id="selectAll" parameterType="java.util.Map"  resultType="java.lang.Integer" statementType="CALLABLE" >
 
-        {call p_statistics_current_month(#{v_customer_id,jdbcType=VARCHAR,mode=IN})}
+
+        {call p_statistics_current_all(#{v_customer_id,jdbcType=VARCHAR,mode=IN})}
 
     </select>
 

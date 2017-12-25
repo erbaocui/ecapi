@@ -9,4 +9,5 @@ public interface IStatisticsService {
     public List<Statistics> getDay(String customerId);
     public List<Statistics>  getMonth(String customerId);
     public List<Statistics> getWeek(String customerId);
+    public Integer getAll(String customerId);
 }

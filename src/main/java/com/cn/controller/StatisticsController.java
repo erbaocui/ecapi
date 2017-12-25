@@ -12,6 +12,7 @@ import com.cn.util.DateUtil;
 import com.cn.util.IdGenerator;
 import com.cn.util.LngLat;
 import com.cn.vo.RetObj;
+import com.cn.vo.RetObjEx;
 import com.cn.vo.Statistics;
 import org.apache.log4j.Logger;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -51,6 +52,8 @@ public class StatisticsController extends BaseController{
     public void setLogger(Logger logger) {
         this.logger = logger;
     }
+    @Autowired
+    private IParamService paramService;
 
 
     /**
@@ -62,9 +65,9 @@ public class StatisticsController extends BaseController{
     @ResponseBody
     @RequestMapping(value = "/day")
     @Config(methods = "day",module = "统计模块",needlogin =true,interfaceLog =true)
-    public RetObj day(HttpServletRequest request)throws Exception
+    public RetObjEx day(HttpServletRequest request)throws Exception
     {
-        RetObj retObj=new RetObj();
+        RetObjEx retObj=new RetObjEx();
         RequestContext requestContext=new RequestContext(request);
         Customer customer=getCurrentCustomer(request);
 
@@ -76,6 +79,12 @@ public class StatisticsController extends BaseController{
             outDay.setDurationTime(statistics.getDurationTime()+requestContext.getMessage("sys.statistics.minute"));
             dataList.add(outDay);
         }
+        Param  param=new Param();
+        param.setKv("use_time");
+        param=paramService.getParamByEntity(param);
+        Integer totalCount=statisticsService.getAll(customer.getId());
+        int useTime=Integer.valueOf(param.getValue())*totalCount;
+        retObj.setTotal(useTime/60);
         retObj.setData(dataList);
         retObj.setMsg(requestContext.getMessage("sys.prompt.success"));
         return retObj;
@@ -209,6 +218,15 @@ public class StatisticsController extends BaseController{
     public void setStatisticsService(IStatisticsService statisticsService) {
         this.statisticsService = statisticsService;
     }
+
+    public IParamService getParamService() {
+        return paramService;
+    }
+
+    public void setParamService(IParamService paramService) {
+        this.paramService = paramService;
+    }
+
     public static  void  main(String args[]){
 
         Calendar c = Calendar.getInstance();

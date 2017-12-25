@@ -16,6 +16,7 @@ public interface IStatisticsDao {
     public List<Statistics> day(String customerId);
     public List<Statistics> month(String customerId);
     public List<Statistics> week(String customerId);
+    public Integer all(String customerId);
 
 
 

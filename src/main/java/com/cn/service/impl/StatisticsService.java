@@ -33,6 +33,11 @@ public class StatisticsService implements IStatisticsService {
         return statisticsDao.week( customerId);
     }
 
+    @Override
+    public Integer getAll(String customerId) {
+        return statisticsDao.all( customerId);
+    }
+
     public IStatisticsDao getStatisticsDao() {
         return statisticsDao;
     }

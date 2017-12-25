@@ -10,6 +10,8 @@ public class OutDevice {
     private Integer useCount=0;
     private Integer chargeCount=0;
     private Integer tar=0;
+    private Integer nicotine=0;
+    private Integer health=0;
     private Integer co=0;
     private Double lat=new Double(0);
     private Double lon=new Double(0);
@@ -161,5 +163,21 @@ public class OutDevice {
 
     public void setShareUrl(String shareUrl) {
         this.shareUrl = shareUrl;
+    }
+
+    public Integer getNicotine() {
+        return nicotine;
+    }
+
+    public void setNicotine(Integer nicotine) {
+        this.nicotine = nicotine;
+    }
+
+    public Integer getHealth() {
+        return health;
+    }
+
+    public void setHealth(Integer health) {
+        this.health = health;
     }
 }

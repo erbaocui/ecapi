@@ -53,6 +53,9 @@ public class DeviceController extends BaseController{
     @Autowired
     private IParamService paramService;
 
+    @Autowired
+    private IStatisticsService statisticsService;
+
 
 
     public Logger getLogger() {
@@ -227,17 +230,39 @@ public class DeviceController extends BaseController{
                     tarRate=Integer.valueOf(param.getValue());
             }
             outDevice.setTar(outDevice.getUseCount()*tarRate);
+            //健康
+            param=new Param();
+            param.setKv("health");
+            param=paramService.getParamByEntity(param);
+            int health=1;
+            if(param.getValue()!=null){
+                health=Integer.valueOf(param.getValue());
+            }
+            outDevice.setHealth(outDevice.getUseCount()*health);
+            //尼古丁
+            param=new Param();
+            param.setKv("nicotine");
+            param=paramService.getParamByEntity(param);
+            int nicotine=1;
+            if(param.getValue()!=null){
+                nicotine=Integer.valueOf(param.getValue());
+            }
+            outDevice.setNicotine(outDevice.getUseCount()*nicotine);
             //app 分享Icon
             param=new Param();
             param.setKv("app_share_icon");
             param=paramService.getParamByEntity(param);
             outDevice.setAppShareIcon(param.getValue());
+
+            //总使用次数
+            Customer customer=getCurrentCustomer( request);
+            Integer totalCount=statisticsService.getAll(customer.getId());
             //app分享title
             param=new Param();
             param.setKv("use_time");
             param=paramService.getParamByEntity(param);
             int useTime=Integer.valueOf(param.getValue());
-             useTime=useTime*outDevice.getUseCount();
+            useTime=useTime*totalCount/60;
             param=new Param();
             param.setKv("app_share_title");
             param=paramService.getParamByEntity(param);
@@ -249,7 +274,7 @@ public class DeviceController extends BaseController{
             param.setKv("app_share_content");
             param=paramService.getParamByEntity(param);
             String  appShareContent=param.getValue();
-            appShareContent=appShareContent.replace("${tar}",String.valueOf( outDevice.getTar()));
+            appShareContent=appShareContent.replace("${tar}",String.valueOf(tarRate*totalCount));
             outDevice.setAppShareContent(appShareContent);
             //分享Icon
             param=new Param();
@@ -409,6 +434,14 @@ public class DeviceController extends BaseController{
 
     public void setParamService(IParamService paramService) {
         this.paramService = paramService;
+    }
+
+    public IStatisticsService getStatisticsService() {
+        return statisticsService;
+    }
+
+    public void setStatisticsService(IStatisticsService statisticsService) {
+        this.statisticsService = statisticsService;
     }
 
     public static  void  main(String args[]){
